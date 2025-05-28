@@ -1,0 +1,7 @@
+repos:
+- repo: local
+  hooks:
+  - id: 'true'
+    name: 'true'
+    entry: 'true'
+    language: system
