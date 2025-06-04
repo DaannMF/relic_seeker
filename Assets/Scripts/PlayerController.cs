@@ -29,10 +29,6 @@ public class PlayerController : MonoBehaviour {
         HandleDetectControllable();
     }
 
-    public void ResetCameraPosition() {
-        cameraTransform.forward = transform.forward;
-    }
-
     private void HandleRotation() {
         float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity * Time.deltaTime;
