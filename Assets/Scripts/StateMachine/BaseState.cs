@@ -4,10 +4,12 @@ using UnityEngine;
 public abstract class BaseState<EState> where EState : Enum {
     public EState StateKey { get; private set; }
     public BaseStateDO<EState> StateData { get; private set; }
+    protected BaseStateContext<EState> Context { get; private set; }
 
-    protected BaseState(EState stateKey, BaseStateDO<EState> stateData) {
+    protected BaseState(EState stateKey, BaseStateDO<EState> stateData, BaseStateContext<EState> context) {
         StateKey = stateKey;
         StateData = stateData;
+        Context = context;
     }
 
     public virtual void Enter() { }

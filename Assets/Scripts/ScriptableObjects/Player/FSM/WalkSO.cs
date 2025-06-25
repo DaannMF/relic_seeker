@@ -1,10 +1,16 @@
-
-using System;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerWalk_Data", menuName = "FSM/Player/Walk", order = 1)]
 public class WalkSO : BaseStateDO<EPlayerStates> {
-    public override BaseState<EPlayerStates> GetState() {
-        return new WalkState(this);
+    [Header("Movement Settings")]
+    [SerializeField] private float moveSpeed = 5f;
+    [SerializeField] private float maxAngleMovement = 30f;
+
+    // Properties to access the settings
+    public float MoveSpeed => moveSpeed;
+    public float MaxAngleMovement => maxAngleMovement;
+
+    public override BaseState<EPlayerStates> GetState(BaseStateContext<EPlayerStates> context) {
+        return new WalkState(context as PlayerStateContext, this);
     }
 }
