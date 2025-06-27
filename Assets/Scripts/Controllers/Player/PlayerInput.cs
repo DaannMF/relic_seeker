@@ -15,6 +15,11 @@ public class PlayerInput : MonoBehaviour {
     public bool JumpHeld { get; private set; }
     public bool JumpReleased { get; private set; }
 
+    // Run input properties
+    public bool RunPressed { get; private set; }
+    public bool RunHeld { get; private set; }
+    public bool RunReleased { get; private set; }
+
     // Settings
     public float MouseSensitivity => mouseSensitivity;
 
@@ -32,5 +37,10 @@ public class PlayerInput : MonoBehaviour {
         JumpPressed = Input.GetKeyDown(KeyCode.Space);
         JumpHeld = Input.GetKey(KeyCode.Space);
         JumpReleased = Input.GetKeyUp(KeyCode.Space);
+
+        // Get run input (Shift key)
+        RunPressed = Input.GetKeyDown(KeyCode.LeftShift);
+        RunHeld = Input.GetKey(KeyCode.LeftShift);
+        RunReleased = Input.GetKeyUp(KeyCode.LeftShift);
     }
 }

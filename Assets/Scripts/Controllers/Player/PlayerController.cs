@@ -10,8 +10,4 @@ public class PlayerController : MonoBehaviour {
         if (stateMachine == null)
             stateMachine = gameObject.AddComponent<PlayerStateMachine>();
     }
-
-    public void OnControlledBy(Controllable controllable) {
-        Debug.Log($"Player is being controlled by {controllable.name}");
-    }
 }

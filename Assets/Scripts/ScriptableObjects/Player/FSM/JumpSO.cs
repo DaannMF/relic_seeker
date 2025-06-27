@@ -18,7 +18,6 @@ public class JumpSO : BaseStateDO<EPlayerStates> {
     [SerializeField] private float groundCheckDistance = 0.1f;
     [SerializeField] private LayerMask groundLayerMask = 1;
 
-    // Properties to access the settings
     public float JumpForce => jumpForce;
     public ForceMode JumpForceMode => jumpForceMode;
 

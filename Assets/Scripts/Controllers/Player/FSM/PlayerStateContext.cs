@@ -48,30 +48,23 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
         this.playerController = playerController;
         this.rotationY = 0f;
         this.rotationX = 0f;
-
-        // Default gravity settings (can be overridden by JumpSO)
         this.gravity = 20f;
         this.maxFallSpeed = 15f;
     }
 
-    // Method to set the player controller reference after initialization
     public void SetPlayerController(PlayerController controller) {
         this.playerController = controller;
     }
 
-    // Method to set gravity settings (called by JumpState)
     public void SetGravitySettings(float gravity, float maxFallSpeed) {
         this.gravity = gravity;
         this.maxFallSpeed = maxFallSpeed;
     }
 
-    // Apply gravity - should be called in FixedUpdate of all states
     public void ApplyGravity() {
-        // Apply custom gravity since rigidbody gravity is disabled
         Vector3 gravityForce = Vector3.down * gravity * rb.mass;
         rb.AddForce(gravityForce, ForceMode.Force);
 
-        // Limit fall speed to prevent infinite acceleration
         Vector3 velocity = rb.velocity;
         if (velocity.y < -maxFallSpeed) {
             velocity.y = -maxFallSpeed;
@@ -79,7 +72,6 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
         }
     }
 
-    // Helper method for ground detection (can be used by multiple states)
     public bool IsGrounded(float checkDistance = 0.1f, LayerMask groundMask = default) {
         if (groundMask == default) groundMask = 1; // Default to layer 0
 
@@ -88,7 +80,6 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
 
         bool isGrounded = Physics.Raycast(ray, checkDistance + 0.1f, groundMask);
 
-        // Debug visualization
 #if UNITY_EDITOR
         Color rayColor = isGrounded ? Color.green : Color.red;
         Debug.DrawRay(rayOrigin, Vector3.down * (checkDistance + 0.1f), rayColor);
@@ -103,7 +94,9 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
         float mouseY = mouseInput.y * input.MouseSensitivity * Time.deltaTime;
 
         rotationY += mouseX;
+
         pivot.rotation = Quaternion.Euler(0f, rotationY, 0f);
+        rb.transform.rotation = Quaternion.Euler(0f, rotationY, 0f);
 
         rotationX -= mouseY;
         rotationX = Mathf.Clamp(rotationX, -maxAngle, maxAngle);
@@ -112,7 +105,10 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
     }
 
     public void HandleDetectControllable() {
-        DrawDebugRay();
+#if UNITY_EDITOR
+        Debug.DrawRay(cameraTransform.position, cameraTransform.forward * detectionRange, Color.red);
+#endif
+
         if (input.InteractPressed) {
             if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit hit, detectionRange)) {
                 if (hit.collider.transform.parent.TryGetComponent(out Controllable controllable)) {
@@ -125,9 +121,29 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
         }
     }
 
-    private void DrawDebugRay() {
-        if (Debug.isDebugBuild) {
-            Debug.DrawRay(cameraTransform.position, cameraTransform.forward * detectionRange, Color.red);
-        }
+    public bool CanMove(Vector3 moveDir, float maxAngleMovement) {
+        Terrain terrain = Terrain.activeTerrain;
+        if (terrain == null) return true;
+
+        Vector3 relativePos = GetMapPos();
+        Vector3 normal = terrain.terrainData.GetInterpolatedNormal(relativePos.x, relativePos.z);
+        float angle = Vector3.Angle(normal, Vector3.up);
+
+        float currentHeight = terrain.SampleHeight(rb.position);
+        float nextHeight = terrain.SampleHeight(rb.position + moveDir * 5);
+
+        if (angle > maxAngleMovement && nextHeight > currentHeight)
+            return false;
+        return true;
+    }
+
+    public Vector3 GetMapPos() {
+        Terrain terrain = Terrain.activeTerrain;
+        if (terrain == null) return Vector3.zero;
+
+        Vector3 pos = rb.position;
+        return new Vector3((pos.x - terrain.transform.position.x) / terrain.terrainData.size.x,
+                           0,
+                           (pos.z - terrain.transform.position.z) / terrain.terrainData.size.z);
     }
 }

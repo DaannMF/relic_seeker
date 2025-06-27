@@ -4,8 +4,9 @@ public class JumpState : BaseState<EPlayerStates> {
     private PlayerStateContext playerContext;
     private JumpSO jumpData;
 
-    // Jump state variables
     private bool hasJumped;
+    private float jumpTimer;
+    private const float MIN_JUMP_TIME = 0.1f;
 
     public JumpState(PlayerStateContext context, JumpSO stateData) : base(EPlayerStates.Jump, stateData, context) {
         playerContext = context;
@@ -13,72 +14,46 @@ public class JumpState : BaseState<EPlayerStates> {
     }
 
     public override void Enter() {
-        Debug.Log("Entering Jump State");
+        playerContext.Animator.SetBool("isJumping", true);
 
-        // Set gravity settings from JumpSO
         playerContext.SetGravitySettings(jumpData.Gravity, jumpData.MaxFallSpeed);
 
-        // Initialize jump
         hasJumped = false;
+        jumpTimer = 0f;
 
-        // Apply initial jump force
         ApplyJumpForce();
-
-        // Handle jump animations
-        // if (playerContext.Animator != null) {
-        //     playerContext.Animator.SetBool("IsJumping", true);
-        //     playerContext.Animator.SetFloat("JumpVelocity", playerContext.Rb.velocity.y);
-        // }
     }
 
     public override void Update() {
-        // Handle rotation in all states
+        jumpTimer += Time.deltaTime;
+
         playerContext.HandleRotation();
-
-        // Handle controllable detection in all states
         playerContext.HandleDetectControllable();
-
-        // Update animations
-        // playerContext.Animator?.SetFloat("JumpVelocity", playerContext.Rb.velocity.y);
     }
 
     public override void FixedUpdate() {
-        // Apply gravity using context (consistent across all states)
         playerContext.ApplyGravity();
-
-        // Handle air movement
         HandleAirMovement();
     }
 
     public override void Exit() {
-        Debug.Log("Exiting Jump State");
-
-        // Reset jump state
+        playerContext.Animator.SetBool("isJumping", false);
         hasJumped = false;
-
-        // Update animations
-        playerContext.Animator?.SetBool("IsJumping", false);
+        jumpTimer = 0f;
     }
 
     public override EPlayerStates GetNextState() {
-        // Check if we're grounded using context method
-        if (playerContext.IsGrounded(jumpData.GroundCheckDistance, jumpData.GroundLayerMask)) {
-            // Determine next ground state based on input
-            if (playerContext.Input.IsMoving) {
-                return EPlayerStates.Walk;
-            }
-            else {
-                return EPlayerStates.Idle;
-            }
+        if (jumpTimer >= MIN_JUMP_TIME &&
+            playerContext.Rb.velocity.y <= 0.1f &&
+            playerContext.IsGrounded(jumpData.GroundCheckDistance, jumpData.GroundLayerMask)) {
+            return playerContext.Input.IsMoving ? EPlayerStates.Walk : EPlayerStates.Idle;
         }
 
-        // Stay in jump state while airborne
         return EPlayerStates.Jump;
     }
 
     private void ApplyJumpForce() {
         if (!hasJumped) {
-            // Apply jump force
             Vector3 jumpForceVector = Vector3.up * jumpData.JumpForce;
             playerContext.Rb.AddForce(jumpForceVector, jumpData.JumpForceMode);
 
@@ -103,16 +78,13 @@ public class JumpState : BaseState<EPlayerStates> {
 
             Vector3 moveDir = (camForward * vertical + camRight * horizontal).normalized;
 
-            // Calculate current horizontal velocity
             Vector3 currentVelocity = playerContext.Rb.velocity;
             Vector3 currentHorizontalVelocity = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
 
-            // Only apply force if we haven't reached max air speed
             if (currentHorizontalVelocity.magnitude < jumpData.MaxAirSpeed) {
                 Vector3 airForce = moveDir * jumpData.AirMoveForce;
                 playerContext.Rb.AddForce(airForce, ForceMode.Force);
 
-                // Clamp horizontal velocity to max air speed
                 Vector3 newVelocity = playerContext.Rb.velocity;
                 Vector3 newHorizontalVelocity = new Vector3(newVelocity.x, 0f, newVelocity.z);
 

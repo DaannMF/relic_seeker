@@ -1,38 +1,33 @@
 using UnityEngine;
 
-public class WalkState : BaseState<EPlayerStates> {
+public class RunState : BaseState<EPlayerStates> {
     private PlayerStateContext playerContext;
-    private WalkSO walkData;
+    private RunSO runData;
 
-    public WalkState(PlayerStateContext context, WalkSO stateData) : base(EPlayerStates.Walk, stateData, context) {
+    public RunState(PlayerStateContext context, RunSO stateData) : base(EPlayerStates.Run, stateData, context) {
         playerContext = context;
-        walkData = stateData;
+        runData = stateData;
     }
 
     public override void Enter() {
-        playerContext.Animator.SetBool("isWalking", true);
+        playerContext.Animator.SetBool("isRunning", true);
     }
 
     public override void Update() {
-        // Handle rotation in all states
         playerContext.HandleRotation();
 
-        // Handle controllable detection in all states
         playerContext.HandleDetectControllable();
 
-        // Handle movement
         HandleMovement();
     }
 
     public override void FixedUpdate() {
-        // Apply gravity to keep player grounded
         playerContext.ApplyGravity();
     }
 
     public override void Exit() {
-        playerContext.Animator.SetBool("isWalking", false);
+        playerContext.Animator.SetBool("isRunning", false);
 
-        // Reset horizontal velocity when exiting walk state
         Vector3 velocity = playerContext.Rb.velocity;
         velocity.x = 0f;
         velocity.z = 0f;
@@ -40,22 +35,17 @@ public class WalkState : BaseState<EPlayerStates> {
     }
 
     public override EPlayerStates GetNextState() {
-        // Check for jump input first (highest priority)
-        if (playerContext.Input.JumpPressed) {
+        if (playerContext.Input.JumpPressed)
             return EPlayerStates.Jump;
-        }
 
-        // Then check for movement
         if (playerContext.Input.IsMoving) {
-
             if (playerContext.Input.RunHeld)
                 return EPlayerStates.Run;
+            else
+                return EPlayerStates.Walk;
 
-
-            return EPlayerStates.Walk;
         }
 
-        // No movement, go to idle
         return EPlayerStates.Idle;
     }
 
@@ -74,9 +64,9 @@ public class WalkState : BaseState<EPlayerStates> {
         camRight.Normalize();
 
         Vector3 moveDir = (camForward * vertical + camRight * horizontal).normalized;
-        Vector3 velocity = new Vector3(moveDir.x * walkData.MoveSpeed, playerContext.Rb.velocity.y, moveDir.z * walkData.MoveSpeed);
+        Vector3 velocity = new Vector3(moveDir.x * runData.RunSpeed, playerContext.Rb.velocity.y, moveDir.z * runData.RunSpeed);
 
-        if (playerContext.CanMove(moveDir, walkData.MaxAngleMovement)) {
+        if (playerContext.CanMove(moveDir, runData.MaxAngleMovement)) {
             playerContext.Rb.velocity = velocity;
         }
     }

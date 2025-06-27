@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 public class PlayerStateMachine : BaseStateMachine<EPlayerStates> {
     [SerializeField] private List<BaseStateDO<EPlayerStates>> _statesData;
@@ -27,9 +28,20 @@ public class PlayerStateMachine : BaseStateMachine<EPlayerStates> {
         if (_animator == null) _animator = GetComponent<Animator>();
         _playerController = GetComponent<PlayerController>();
 
+        ValidateRequiredComponents();
+
         _context = new PlayerStateContext(_rb, _input, _animator, pivot, cameraTransform,
                                          maxAngle, detectionRange, _playerController);
         Initialize();
+    }
+
+    private void ValidateRequiredComponents() {
+        Assert.IsNotNull(_rb, "Rigidbody is not assigned in PlayerStateMachine.");
+        Assert.IsNotNull(_input, "PlayerInput is not assigned in PlayerStateMachine.");
+        Assert.IsNotNull(_animator, "Animator is not assigned in PlayerStateMachine.");
+        Assert.IsNotNull(_playerController, "PlayerController is not assigned in PlayerStateMachine.");
+        Assert.IsNotNull(pivot, "Pivot Transform is not assigned in PlayerStateMachine.");
+        Assert.IsNotNull(cameraTransform, "Camera Transform is not assigned in PlayerStateMachine.");
     }
 
     private void Initialize() {
@@ -37,11 +49,5 @@ public class PlayerStateMachine : BaseStateMachine<EPlayerStates> {
             AddState(stateData.GetState(_context));
 
         _currentState = _states[EPlayerStates.Idle];
-    }
-
-    // Method to update player controller reference if needed
-    public void SetPlayerController(PlayerController controller) {
-        _playerController = controller;
-        _context.SetPlayerController(controller);
     }
 }
