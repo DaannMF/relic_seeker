@@ -15,10 +15,10 @@ public class WalkState : BaseState<EPlayerStates> {
 
     public override void Update() {
         // Handle rotation in all states
-        playerContext.HandleRotation();
+        playerContext.PlayerController.HandleRotation();
 
         // Handle controllable detection in all states
-        playerContext.HandleDetectControllable();
+        playerContext.PlayerController.HandleDetectControllable();
 
         // Handle movement
         HandleMovement();
@@ -33,10 +33,10 @@ public class WalkState : BaseState<EPlayerStates> {
         playerContext.Animator.SetBool("isWalking", false);
 
         // Reset horizontal velocity when exiting walk state
-        Vector3 velocity = playerContext.Rb.velocity;
+        Vector3 velocity = playerContext.PlayerController.Rb.velocity;
         velocity.x = 0f;
         velocity.z = 0f;
-        playerContext.Rb.velocity = velocity;
+        playerContext.PlayerController.Rb.velocity = velocity;
     }
 
     public override EPlayerStates GetNextState() {
@@ -65,19 +65,14 @@ public class WalkState : BaseState<EPlayerStates> {
         float horizontal = input.x;
         float vertical = input.y;
 
-        Vector3 camForward = playerContext.CameraTransform.forward;
-        camForward.y = 0f;
-        camForward.Normalize();
-
-        Vector3 camRight = playerContext.CameraTransform.right;
-        camRight.y = 0f;
-        camRight.Normalize();
+        Vector3 camForward = playerContext.PlayerController.GetCameraForward();
+        Vector3 camRight = playerContext.PlayerController.GetCameraRight();
 
         Vector3 moveDir = (camForward * vertical + camRight * horizontal).normalized;
-        Vector3 velocity = new Vector3(moveDir.x * walkData.MoveSpeed, playerContext.Rb.velocity.y, moveDir.z * walkData.MoveSpeed);
+        Vector3 velocity = new Vector3(moveDir.x * walkData.MoveSpeed, playerContext.PlayerController.Rb.velocity.y, moveDir.z * walkData.MoveSpeed);
 
         if (playerContext.CanMove(moveDir, walkData.MaxAngleMovement)) {
-            playerContext.Rb.velocity = velocity;
+            playerContext.PlayerController.Rb.velocity = velocity;
         }
     }
 }

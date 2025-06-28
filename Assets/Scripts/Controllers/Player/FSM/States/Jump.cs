@@ -27,8 +27,8 @@ public class JumpState : BaseState<EPlayerStates> {
     public override void Update() {
         jumpTimer += Time.deltaTime;
 
-        playerContext.HandleRotation();
-        playerContext.HandleDetectControllable();
+        playerContext.PlayerController.HandleRotation();
+        playerContext.PlayerController.HandleDetectControllable();
     }
 
     public override void FixedUpdate() {
@@ -44,7 +44,7 @@ public class JumpState : BaseState<EPlayerStates> {
 
     public override EPlayerStates GetNextState() {
         if (jumpTimer >= MIN_JUMP_TIME &&
-            playerContext.Rb.velocity.y <= 0.1f &&
+            playerContext.PlayerController.Rb.velocity.y <= 0.1f &&
             playerContext.IsGrounded(jumpData.GroundCheckDistance, jumpData.GroundLayerMask)) {
             return playerContext.Input.IsMoving ? EPlayerStates.Walk : EPlayerStates.Idle;
         }
@@ -55,7 +55,7 @@ public class JumpState : BaseState<EPlayerStates> {
     private void ApplyJumpForce() {
         if (!hasJumped) {
             Vector3 jumpForceVector = Vector3.up * jumpData.JumpForce;
-            playerContext.Rb.AddForce(jumpForceVector, jumpData.JumpForceMode);
+            playerContext.PlayerController.Rb.AddForce(jumpForceVector, jumpData.JumpForceMode);
 
             hasJumped = true;
         }
@@ -68,29 +68,24 @@ public class JumpState : BaseState<EPlayerStates> {
             float horizontal = input.x;
             float vertical = input.y;
 
-            Vector3 camForward = playerContext.CameraTransform.forward;
-            camForward.y = 0f;
-            camForward.Normalize();
-
-            Vector3 camRight = playerContext.CameraTransform.right;
-            camRight.y = 0f;
-            camRight.Normalize();
+            Vector3 camForward = playerContext.PlayerController.GetCameraForward();
+            Vector3 camRight = playerContext.PlayerController.GetCameraRight();
 
             Vector3 moveDir = (camForward * vertical + camRight * horizontal).normalized;
 
-            Vector3 currentVelocity = playerContext.Rb.velocity;
+            Vector3 currentVelocity = playerContext.PlayerController.Rb.velocity;
             Vector3 currentHorizontalVelocity = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
 
             if (currentHorizontalVelocity.magnitude < jumpData.MaxAirSpeed) {
                 Vector3 airForce = moveDir * jumpData.AirMoveForce;
-                playerContext.Rb.AddForce(airForce, ForceMode.Force);
+                playerContext.PlayerController.Rb.AddForce(airForce, ForceMode.Force);
 
-                Vector3 newVelocity = playerContext.Rb.velocity;
+                Vector3 newVelocity = playerContext.PlayerController.Rb.velocity;
                 Vector3 newHorizontalVelocity = new Vector3(newVelocity.x, 0f, newVelocity.z);
 
                 if (newHorizontalVelocity.magnitude > jumpData.MaxAirSpeed) {
                     newHorizontalVelocity = newHorizontalVelocity.normalized * jumpData.MaxAirSpeed;
-                    playerContext.Rb.velocity = new Vector3(newHorizontalVelocity.x, newVelocity.y, newHorizontalVelocity.z);
+                    playerContext.PlayerController.Rb.velocity = new Vector3(newHorizontalVelocity.x, newVelocity.y, newHorizontalVelocity.z);
                 }
             }
         }

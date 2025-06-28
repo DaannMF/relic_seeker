@@ -18,7 +18,7 @@ MonoBehaviour:
   maxFallSpeed: 15
   airMoveForce: 100
   maxAirSpeed: 5
-  groundCheckDistance: 1.1
+  groundCheckDistance: 0.2
   groundLayerMask:
     serializedVersion: 2
     m_Bits: 64
