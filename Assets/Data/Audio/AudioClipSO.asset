@@ -38,3 +38,8 @@ MonoBehaviour:
     audioType: 2
     loop: 0
     is3D: 1
+  - clipName: Key_Pickup
+    clip: {fileID: 8300000, guid: dad214be9142b4159bf237a2c6f10d59, type: 3}
+    audioType: 2
+    loop: 0
+    is3D: 0

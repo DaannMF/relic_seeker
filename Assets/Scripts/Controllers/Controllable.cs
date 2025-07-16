@@ -6,8 +6,12 @@ public class Controllable : MonoBehaviour, IControllable {
     [SerializeField] private bool isOriginalPlayer = false;
     [SerializeField] private Vector3 cameraPositionReference;
 
+    [Header("UI Settings")]
+    [SerializeField] private string controlPromptMessage = "Press E to control";
+
     private static Controllable originalPlayer;
     private static Controllable lastControlledEntity;
+    private bool isShowingPrompt = false;
 
     private void Awake() {
         if (isOriginalPlayer) {
@@ -33,6 +37,34 @@ public class Controllable : MonoBehaviour, IControllable {
 
             originalPlayer.ControlEntity(controller);
         }
+    }
+
+    public void OnStartLooking() {
+        if (!isShowingPrompt) {
+            UIEvents.OnPromptShow?.Invoke(controlPromptMessage);
+            isShowingPrompt = true;
+        }
+
+        // Also call outline for visual feedback
+        OutlineEntity();
+    }
+
+    public void OnStopLooking() {
+        if (isShowingPrompt) {
+            UIEvents.OnPromptHide?.Invoke();
+            isShowingPrompt = false;
+        }
+    }
+
+    public void OnInteract(PlayerController controller) {
+        // Hide prompt when interacting
+        if (isShowingPrompt) {
+            UIEvents.OnPromptHide?.Invoke();
+            isShowingPrompt = false;
+        }
+
+        // Control the entity
+        ControlEntity(controller);
     }
 
     public void ControlEntity(PlayerController playerController) {

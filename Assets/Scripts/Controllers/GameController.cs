@@ -5,15 +5,38 @@ public class GameController : MonoBehaviour {
 
     private void Awake() {
         DontDestroyOnLoad(gameObject);
+        EnsureRequiredManagers();
         SubscribeToInputEvents();
     }
 
     private void Start() {
         SetGameState(GameState.MainMenu);
+        CheckForMainMenuReset();
     }
 
     private void OnDestroy() {
         UnsubscribeFromInputEvents();
+    }
+
+    private void EnsureRequiredManagers() {
+        // Ensure KeyInventoryManager exists
+        if (KeyInventoryManager.Instance == null) {
+            GameObject keyManagerObj = new GameObject("KeyInventoryManager");
+            keyManagerObj.AddComponent<KeyInventoryManager>();
+        }
+    }
+
+    private void CheckForMainMenuReset() {
+        // Reset keys when returning to MainMenu scene
+        string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        if (currentScene.Contains("MainMenu")) {
+            ResetGameProgress();
+        }
+    }
+
+    private void ResetGameProgress() {
+        // Reset keys to 0 for new game session
+        InventoryEvents.OnSetKeys?.Invoke(0);
     }
 
     private void SubscribeToInputEvents() {
@@ -64,6 +87,7 @@ public class GameController : MonoBehaviour {
     }
 
     private void HandleReturnToMenuRequested() {
+        ResetGameProgress();
         SetGameState(GameState.MainMenu);
     }
 

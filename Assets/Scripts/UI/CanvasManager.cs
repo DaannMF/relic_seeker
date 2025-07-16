@@ -22,14 +22,8 @@ public class CanvasManager : MonoBehaviour {
 
     private void Start() {
         SubscribeToEvents();
-
-        if (mainMenuPanel == null) {
-            mainMenuPanel = transform.Find("MainMenu")?.gameObject;
-        }
-
-        if (hudPanel == null) {
-            hudPanel = transform.Find("HUD")?.gameObject;
-        }
+        AutoDetectUIElements();
+        EnsureKeyCounterUIExists();
     }
 
     private void OnDestroy() {
@@ -139,5 +133,48 @@ public class CanvasManager : MonoBehaviour {
         if (promptText != null) {
             promptText.text = "";
         }
+    }
+
+    private void AutoDetectUIElements() {
+        if (mainMenuPanel == null) {
+            mainMenuPanel = transform.Find("MainMenu")?.gameObject;
+        }
+
+        if (hudPanel == null) {
+            hudPanel = transform.Find("HUD")?.gameObject;
+        }
+    }
+
+    private void EnsureKeyCounterUIExists() {
+        // Look for KeyCounter GameObject
+        Transform keyCounterTransform = FindChildRecursive(transform, "KeyCounter");
+
+        if (keyCounterTransform != null) {
+            // Check if it already has KeyCounterUI component
+            KeyCounterUI existingKeyCounter = keyCounterTransform.GetComponent<KeyCounterUI>();
+
+            if (existingKeyCounter == null) {
+                // Add KeyCounterUI component
+                keyCounterTransform.gameObject.AddComponent<KeyCounterUI>();
+                Debug.Log("[CanvasManager] Added KeyCounterUI component to KeyCounter GameObject");
+            }
+        }
+        else {
+            Debug.LogWarning("[CanvasManager] KeyCounter GameObject not found in hierarchy");
+        }
+    }
+
+    private Transform FindChildRecursive(Transform parent, string childName) {
+        foreach (Transform child in parent) {
+            if (child.name == childName) {
+                return child;
+            }
+
+            Transform result = FindChildRecursive(child, childName);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 }

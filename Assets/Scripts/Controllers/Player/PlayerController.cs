@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour {
     private float rotationY;
     private float rotationX;
     private bool isInInterior = false;
+    private Controllable currentDetectedControllable;
 
     public Rigidbody Rb => rb;
     public bool IsInInterior => isInInterior;
@@ -66,12 +67,33 @@ public class PlayerController : MonoBehaviour {
 
     public void HandleDetectControllable() {
         int layer = LayerMask.GetMask("Controllable");
+        Controllable detectedControllable = null;
+
         if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, detectionRange, layer)) {
-            if (hit.collider.transform.parent.TryGetComponent(out Controllable controllable))
-                if (input.InteractPressed)
-                    controllable.ControlEntity(this);
-                else
-                    controllable.OutlineEntity();
+            if (hit.collider.transform.parent.TryGetComponent(out Controllable controllable)) {
+                detectedControllable = controllable;
+
+                // If this is a new controllable, show prompt
+                if (currentDetectedControllable != detectedControllable) {
+                    if (currentDetectedControllable != null) {
+                        currentDetectedControllable.OnStopLooking();
+                    }
+
+                    currentDetectedControllable = detectedControllable;
+                    controllable.OnStartLooking();
+                }
+
+                // Handle interaction
+                if (input.InteractPressed) {
+                    controllable.OnInteract(this);
+                }
+            }
+        }
+
+        // If no controllable detected but we had one before, hide prompt
+        if (detectedControllable == null && currentDetectedControllable != null) {
+            currentDetectedControllable.OnStopLooking();
+            currentDetectedControllable = null;
         }
     }
 
@@ -106,6 +128,12 @@ public class PlayerController : MonoBehaviour {
                 rotationX -= 360f;
             }
         }
+
+        // Clear any detected controllable when switching entities
+        if (currentDetectedControllable != null) {
+            currentDetectedControllable.OnStopLooking();
+            currentDetectedControllable = null;
+        }
     }
 
     public void SetCameraPosition(Vector3 newPosition) {
@@ -114,5 +142,13 @@ public class PlayerController : MonoBehaviour {
 
     public void SetIsInInterior(bool isInInterior) {
         this.isInInterior = isInInterior;
+    }
+
+    private void OnDisable() {
+        // Clear any detected controllable when player is disabled
+        if (currentDetectedControllable != null) {
+            currentDetectedControllable.OnStopLooking();
+            currentDetectedControllable = null;
+        }
     }
 }
