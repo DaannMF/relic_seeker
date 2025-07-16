@@ -10,6 +10,7 @@ public class RunState : BaseState<EPlayerStates> {
 
     public override void Update() {
         HandleMovement();
+        HandleFootsteps();
     }
 
     public override void FixedUpdate() {
@@ -52,6 +53,13 @@ public class RunState : BaseState<EPlayerStates> {
 
         if (Context.CanMove(moveDir, StateData.MaxAngleMovement)) {
             Context.PlayerController.Rb.velocity = velocity;
+        }
+    }
+
+    private void HandleFootsteps() {
+        if (Context.FootstepSystem != null) {
+            float runInterval = Context.FootstepSystem.GetRunInterval();
+            Context.FootstepSystem.UpdateFootsteps(runInterval, Context.Input.IsMoving);
         }
     }
 }

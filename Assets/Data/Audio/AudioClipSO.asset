@@ -23,3 +23,18 @@ MonoBehaviour:
     audioType: 1
     loop: 0
     is3D: 0
+  - clipName: Footstep_Grass
+    clip: {fileID: 8300000, guid: e95495806f6314d9d83d94cf3e4ec306, type: 3}
+    audioType: 2
+    loop: 0
+    is3D: 1
+  - clipName: Footstep_Dirt
+    clip: {fileID: 8300000, guid: 15d224de781e04b7881c0a00d2040709, type: 3}
+    audioType: 2
+    loop: 0
+    is3D: 1
+  - clipName: Footstep_Normal
+    clip: {fileID: 8300000, guid: 016c287a677ab4b38b403155e14fa507, type: 3}
+    audioType: 2
+    loop: 0
+    is3D: 1

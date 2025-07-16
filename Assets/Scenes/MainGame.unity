@@ -745,6 +745,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5381386135662447605, guid: 21a364ddeffc797439f2a5721660b0e6, type: 3}
   m_PrefabInstance: {fileID: 2007440781}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &922254768
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 922254769}
+  m_Layer: 0
+  m_Name: FootSteps
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &922254769
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 922254768}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7089464125811048222}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &945932047
 GameObject:
   m_ObjectHideFlags: 0
@@ -1011,6 +1042,24 @@ MonoBehaviour:
   maxCameraAngle: 80
   cameraTransform: {fileID: 1347303115}
   pivot: {fileID: 580060521}
+--- !u!114 &1533758188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1533758182}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f3b40c21d4e4478f9d9fed7aff47cb3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkFootstepInterval: 0.5
+  runFootstepInterval: 0.3
+  audioSourcePosition: {fileID: 922254769}
+  grassFootstepAudio: Footstep_Grass
+  dirtFootstepAudio: Footstep_Dirt
+  normalFootstepAudio: Footstep_Normal
 --- !u!1001 &1553880834
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1613,6 +1662,9 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 5241715288214216981, guid: eb31ccb365e4d48fb84db3f83630ef03, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 922254769}
     - targetCorrespondingSourceObject: {fileID: 1529360700437133520, guid: eb31ccb365e4d48fb84db3f83630ef03, type: 3}
       insertIndex: -1
       addedObject: {fileID: 580060521}
@@ -1626,6 +1678,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 2207814065059501526, guid: eb31ccb365e4d48fb84db3f83630ef03, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1533758185}
+    - targetCorrespondingSourceObject: {fileID: 2207814065059501526, guid: eb31ccb365e4d48fb84db3f83630ef03, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1533758188}
   m_SourcePrefab: {fileID: 100100000, guid: eb31ccb365e4d48fb84db3f83630ef03, type: 3}
 --- !u!4 &7089464125811048222 stripped
 Transform:

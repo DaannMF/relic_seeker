@@ -218,6 +218,9 @@ public class GameSceneManager : MonoBehaviour {
                 playerController.transform.parent.rotation = spawnRotation;
             }
 
+            // SYNC: Update PlayerController's IsInInterior state
+            playerController.SetIsInInterior(true);
+
             playerController.enabled = true;
 
             // Final validation
@@ -286,6 +289,9 @@ public class GameSceneManager : MonoBehaviour {
             playerController.transform.parent.position = safePosition;
             playerController.transform.parent.rotation = originalPlayerRotation;
 
+            // SYNC: Update PlayerController's IsInInterior state
+            playerController.SetIsInInterior(false);
+
             // Wait one more frame before enabling player
             yield return null;
             playerController.enabled = true;
@@ -313,6 +319,15 @@ public class GameSceneManager : MonoBehaviour {
         currentMainScene = sceneName;
         isInInterior = false;
         currentInteriorScene = "";
+
+        // SYNC: Update PlayerController's IsInInterior state if available
+        if (playerController == null) {
+            playerController = FindObjectOfType<PlayerController>();
+        }
+
+        if (playerController != null) {
+            playerController.SetIsInInterior(false);
+        }
 
         if (mainSceneEnvironment == null) {
             AutoDetectMainEnvironment();

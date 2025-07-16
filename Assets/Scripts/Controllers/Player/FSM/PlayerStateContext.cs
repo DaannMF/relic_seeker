@@ -3,17 +3,20 @@ using UnityEngine;
 public class PlayerStateContext : BaseStateContext<EPlayerStates> {
     private PlayerInput input;
     private PlayerController playerController;
+    private FootstepSystem footstepSystem;
 
     private float gravity;
     private float maxFallSpeed;
 
     public PlayerInput Input => input;
     public PlayerController PlayerController => playerController;
+    public FootstepSystem FootstepSystem => footstepSystem;
 
     public PlayerStateContext(PlayerInput input, Animator animator, PlayerController playerController) {
         this.input = input;
         this._animator = animator;
         this.playerController = playerController;
+        this.footstepSystem = playerController.GetComponent<FootstepSystem>();
         this.gravity = 20f;
         this.maxFallSpeed = 15f;
     }
