@@ -146,6 +146,7 @@ GameObject:
   - component: {fileID: 3654071812229848360}
   - component: {fileID: 3519215762855200827}
   - component: {fileID: 4676398874319554435}
+  - component: {fileID: 7193212357529655372}
   m_Layer: 5
   m_Name: Button
   m_TagString: Untagged
@@ -171,7 +172,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 160, y: 47.7}
+  m_SizeDelta: {x: 200, y: 47.7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3654071812229848360
 CanvasRenderer:
@@ -255,3 +256,17 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7193212357529655372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3360018289693167334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c576a148078b34510bd5196144d618f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playHoverSound: 1
+  playClickSound: 1

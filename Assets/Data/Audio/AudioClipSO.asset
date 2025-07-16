@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f81c3522383e848308cd4c5153883ad3, type: 3}
+  m_Name: AudioClipSO
+  m_EditorClassIdentifier: 
+  audioClips:
+  - clipName: ButtonHover
+    clip: {fileID: 8300000, guid: 0246f01c70dde4f9ca133ccfc64b644e, type: 3}
+    audioType: 1
+    loop: 0
+    is3D: 0
+  - clipName: ButtonClick
+    clip: {fileID: 8300000, guid: af139a810b091416186bb99def0498af, type: 3}
+    audioType: 1
+    loop: 0
+    is3D: 0

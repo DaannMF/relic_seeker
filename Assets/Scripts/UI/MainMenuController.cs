@@ -47,10 +47,6 @@ public class MainMenuController : MonoBehaviour {
             playButtonText = playButton.GetComponentInChildren<TextMeshProUGUI>();
         }
 
-        if (returnToMenuButton == null) {
-            returnToMenuButton = transform.Find("ReturnToMenuButton")?.GetComponent<Button>();
-        }
-
 #if UNITY_WEBGL
         if (quitButton != null) {
             quitButton.gameObject.SetActive(false);
