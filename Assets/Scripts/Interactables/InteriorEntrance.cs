@@ -22,7 +22,7 @@ public class InteriorEntrance : MonoBehaviour {
         if (player != null) {
             playerInRange = true;
             currentPlayer = player;
-            UIEvents.OnPromptShow.Invoke("Press E to enter");
+            UIEvents.OnPromptShow?.Invoke("Press E to enter");
         }
     }
 
@@ -31,7 +31,7 @@ public class InteriorEntrance : MonoBehaviour {
         if (player != null) {
             playerInRange = false;
             currentPlayer = null;
-            UIEvents.OnPromptHide.Invoke();
+            UIEvents.OnPromptHide?.Invoke();
         }
     }
 
@@ -46,12 +46,12 @@ public class InteriorEntrance : MonoBehaviour {
     }
 
     private void EnterInterior() {
-        if (InteriorSceneManager.Instance != null && !string.IsNullOrEmpty(interiorSceneName)) {
+        if (GameSceneManager.Instance != null && !string.IsNullOrEmpty(interiorSceneName)) {
             UIEvents.OnPromptHide.Invoke();
-            InteriorSceneManager.Instance.EnterInterior(interiorSceneName, spawnPointID);
+            GameSceneManager.Instance.LoadInteriorScene(interiorSceneName, spawnPointID);
         }
         else {
-            Debug.LogWarning("InteriorSceneManager not found or scene name is empty!");
+            Debug.LogWarning("GameSceneManager not found or scene name is empty!");
         }
     }
 

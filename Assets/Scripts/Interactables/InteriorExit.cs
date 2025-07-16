@@ -49,12 +49,12 @@ public class InteriorExit : MonoBehaviour {
     }
 
     private void ExitInterior() {
-        if (InteriorSceneManager.Instance != null) {
+        if (GameSceneManager.Instance != null) {
             UIEvents.OnPromptHide.Invoke();
-            InteriorSceneManager.Instance.ExitInterior();
+            GameSceneManager.Instance.ExitInterior();
         }
         else {
-            Debug.LogWarning("InteriorSceneManager not found!");
+            Debug.LogWarning("GameSceneManager not found!");
         }
     }
 

@@ -20,6 +20,9 @@ public class PlayerInput : MonoBehaviour {
     // Return to original player
     public bool ReturnToPlayerPressed { get; private set; }
 
+    // Pause/Menu input
+    public bool PausePressed { get; private set; }
+
     private void Update() {
         // Get movement input
         MovementInput = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -42,5 +45,17 @@ public class PlayerInput : MonoBehaviour {
 
         // Get return to player input (1 key)
         ReturnToPlayerPressed = Input.GetKeyDown(KeyCode.Alpha1);
+
+        // Get pause input (Esc key)
+        PausePressed = Input.GetKeyDown(KeyCode.Escape);
+
+        // Handle pause toggle (always available in game, scene-based check)
+        if (PausePressed) {
+            // Only allow pause if we're not in MainMenu scene
+            string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (!currentScene.Contains("MainMenu")) {
+                GameEvents.OnTogglePauseRequested?.Invoke();
+            }
+        }
     }
 }

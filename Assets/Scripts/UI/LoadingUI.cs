@@ -8,16 +8,35 @@ public class LoadingUI : MonoBehaviour {
     [SerializeField] private Slider progressBar;
     [SerializeField] private Text loadingText;
     [SerializeField] private Text progressText;
+    [SerializeField] private Text titleText;
 
     [Header("Loading Settings")]
     [SerializeField]
-    private string[] loadingMessages = {
+    private string[] defaultLoadingMessages = {
         "Loading...",
-        "Entering Interior...",
         "Preparing Environment...",
         "Almost Ready..."
     };
+
+    [SerializeField]
+    private string[] interiorEntryMessages = {
+        "Entering Interior...",
+        "Preparing Interior Space...",
+        "Loading Interior Assets...",
+        "Almost Ready..."
+    };
+
+    [SerializeField]
+    private string[] interiorExitMessages = {
+        "Exiting Interior...",
+        "Returning to Main Area...",
+        "Restoring Environment...",
+        "Almost Ready..."
+    };
+
     [SerializeField] private float messageChangeInterval = 1f;
+
+    private string[] currentMessages;
 
     private Coroutine loadingMessageCoroutine;
 
@@ -34,12 +53,18 @@ public class LoadingUI : MonoBehaviour {
         foreach (Text text in texts) {
             if (text.name == "LoadingText") loadingText = text;
             if (text.name == "ProgressText") progressText = text;
+            if (text.name == "TitleText") titleText = text;
         }
     }
 
     public void ShowLoadingScreen() {
         if (loadingPanel != null) {
             loadingPanel.SetActive(true);
+        }
+
+        // Set default messages if none are set
+        if (currentMessages == null) {
+            currentMessages = defaultLoadingMessages;
         }
 
         // Reset progress
@@ -84,9 +109,9 @@ public class LoadingUI : MonoBehaviour {
         int messageIndex = 0;
 
         while (true) {
-            if (loadingText != null && loadingMessages.Length > 0) {
-                loadingText.text = loadingMessages[messageIndex];
-                messageIndex = (messageIndex + 1) % loadingMessages.Length;
+            if (loadingText != null && currentMessages != null && currentMessages.Length > 0) {
+                loadingText.text = currentMessages[messageIndex];
+                messageIndex = (messageIndex + 1) % currentMessages.Length;
             }
 
             yield return new WaitForSeconds(messageChangeInterval);
@@ -96,6 +121,22 @@ public class LoadingUI : MonoBehaviour {
     public void SetLoadingMessage(string message) {
         if (loadingText != null) {
             loadingText.text = message;
+        }
+    }
+
+    public void SetLoadingType(string loadingType) {
+        switch (loadingType.ToLower()) {
+            case "interior_entry":
+                currentMessages = interiorEntryMessages;
+                break;
+            case "interior_exit":
+                currentMessages = interiorExitMessages;
+                break;
+            case "single":
+            case "default":
+            default:
+                currentMessages = defaultLoadingMessages;
+                break;
         }
     }
 }
