@@ -1,28 +1,26 @@
 using UnityEngine;
 
 public class EnemyPatrolState : BaseState<EEnemyStates> {
-    private EnemyStateContext enemyContext;
-    private EnemyPatrolSO patrolData;
+    private new EnemyStateContext Context => base.Context as EnemyStateContext;
+    private new EnemyPatrolSO StateData => base.StateData as EnemyPatrolSO;
     private Vector3 targetPatrolPoint;
     private bool waitingAtPoint;
 
-    public EnemyPatrolState(EnemyStateContext context, EnemyPatrolSO stateData) : base(EEnemyStates.Patrol, stateData, context) {
-        enemyContext = context;
-        patrolData = stateData;
+    public EnemyPatrolState(EnemyStateContext context, EnemyPatrolSO stateData) :
+        base(EEnemyStates.Patrol, stateData, context) {
     }
 
-    public override void Enter() {
-        enemyContext.Animator.SetBool("isWalking", true);
-        enemyContext.ResetStateTimer();
-        targetPatrolPoint = enemyContext.GetNextPatrolPoint();
+    public override void OnEnter() {
+        Context.ResetStateTimer();
+        targetPatrolPoint = Context.GetNextPatrolPoint();
         waitingAtPoint = false;
     }
 
     public override void Update() {
-        enemyContext.UpdateStateTimer();
+        Context.UpdateStateTimer();
 
-        if (Vector3.Distance(enemyContext.EnemyController.transform.position, enemyContext.EnemyController.Player.position) <= patrolData.detectionWhilePatrolling) {
-            if (enemyContext.EnemyController.CanSeePlayer()) {
+        if (Vector3.Distance(Context.EnemyController.transform.position, Context.EnemyController.Player.position) <= StateData.detectionWhilePatrolling) {
+            if (Context.EnemyController.CanSeePlayer()) {
                 return;
             }
         }
@@ -30,27 +28,26 @@ public class EnemyPatrolState : BaseState<EEnemyStates> {
 
     public override void FixedUpdate() {
         if (!waitingAtPoint) {
-            enemyContext.EnemyController.HandleMovement(targetPatrolPoint, patrolData.patrolSpeed);
+            Context.EnemyController.HandleMovement(targetPatrolPoint, StateData.patrolSpeed);
 
-            if (enemyContext.EnemyController.IsAtPosition(targetPatrolPoint, 1f)) {
+            if (Context.EnemyController.IsAtPosition(targetPatrolPoint, 1f)) {
                 waitingAtPoint = true;
-                enemyContext.EnemyController.StopMovement();
-                enemyContext.ResetStateTimer();
+                Context.EnemyController.StopMovement();
+                Context.ResetStateTimer();
             }
         }
     }
 
     public override void Exit() {
-        enemyContext.Animator.SetBool("isWalking", false);
-        enemyContext.EnemyController.StopMovement();
+        Context.EnemyController.StopMovement();
     }
 
     public override EEnemyStates GetNextState() {
-        if (enemyContext.EnemyController.CanSeePlayer()) {
+        if (Context.EnemyController.CanSeePlayer()) {
             return EEnemyStates.Chase;
         }
 
-        if (waitingAtPoint && enemyContext.StateTimer >= patrolData.waitTimeAtPoint) {
+        if (waitingAtPoint && Context.StateTimer >= StateData.waitTimeAtPoint) {
             return EEnemyStates.Idle;
         }
 

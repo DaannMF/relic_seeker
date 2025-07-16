@@ -1,32 +1,30 @@
 using UnityEngine;
 
 public class EnemyChaseState : BaseState<EEnemyStates> {
-    private EnemyStateContext enemyContext;
-    private EnemyChaseSO chaseData;
+    private new EnemyStateContext Context => base.Context as EnemyStateContext;
+    private new EnemyChaseSO StateData => base.StateData as EnemyChaseSO;
     private Vector3 lastKnownPlayerPosition;
     private float timeSincePlayerSeen;
 
-    public EnemyChaseState(EnemyStateContext context, EnemyChaseSO stateData) : base(EEnemyStates.Chase, stateData, context) {
-        enemyContext = context;
-        chaseData = stateData;
+    public EnemyChaseState(EnemyStateContext context, EnemyChaseSO stateData) :
+        base(EEnemyStates.Chase, stateData, context) {
     }
 
-    public override void Enter() {
-        enemyContext.Animator.SetBool("isChasing", true);
-        enemyContext.ResetStateTimer();
+    public override void OnEnter() {
+        Context.ResetStateTimer();
         timeSincePlayerSeen = 0f;
 
-        if (enemyContext.EnemyController.Player != null) {
-            lastKnownPlayerPosition = enemyContext.EnemyController.Player.position;
+        if (Context.EnemyController.Player != null) {
+            lastKnownPlayerPosition = Context.EnemyController.Player.position;
         }
     }
 
     public override void Update() {
-        enemyContext.UpdateStateTimer();
+        Context.UpdateStateTimer();
 
-        if (enemyContext.EnemyController.CanSeePlayer()) {
+        if (Context.EnemyController.CanSeePlayer()) {
             timeSincePlayerSeen = 0f;
-            lastKnownPlayerPosition = enemyContext.EnemyController.Player.position;
+            lastKnownPlayerPosition = Context.EnemyController.Player.position;
         }
         else {
             timeSincePlayerSeen += Time.deltaTime;
@@ -34,25 +32,24 @@ public class EnemyChaseState : BaseState<EEnemyStates> {
     }
 
     public override void FixedUpdate() {
-        Vector3 targetPosition = enemyContext.EnemyController.CanSeePlayer() ?
-            enemyContext.EnemyController.Player.position : lastKnownPlayerPosition;
+        Vector3 targetPosition = Context.EnemyController.CanSeePlayer() ?
+            Context.EnemyController.Player.position : lastKnownPlayerPosition;
 
-        enemyContext.EnemyController.HandleMovement(targetPosition, chaseData.chaseSpeed);
+        Context.EnemyController.HandleMovement(targetPosition, StateData.chaseSpeed);
     }
 
     public override void Exit() {
-        enemyContext.Animator.SetBool("isChasing", false);
-        enemyContext.EnemyController.StopMovement();
+        Context.EnemyController.StopMovement();
     }
 
     public override EEnemyStates GetNextState() {
-        float distanceToPlayer = enemyContext.EnemyController.DistanceToPlayer();
+        float distanceToPlayer = Context.EnemyController.DistanceToPlayer();
 
-        if (distanceToPlayer <= chaseData.attackDistance && enemyContext.EnemyController.CanSeePlayer()) {
+        if (distanceToPlayer <= StateData.attackDistance && Context.EnemyController.CanSeePlayer()) {
             return EEnemyStates.Attack;
         }
 
-        if (timeSincePlayerSeen >= chaseData.losePlayerTime || distanceToPlayer > chaseData.maxChaseDistance) {
+        if (timeSincePlayerSeen >= StateData.losePlayerTime || distanceToPlayer > StateData.maxChaseDistance) {
             return EEnemyStates.Idle;
         }
 

@@ -1,4 +1,4 @@
 interface IControllable {
-    void ShadeEntity();
+    void OutlineEntity();
     void ControlEntity(PlayerController controller);
 }

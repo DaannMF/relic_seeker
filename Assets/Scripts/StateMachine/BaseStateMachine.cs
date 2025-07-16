@@ -10,6 +10,12 @@ public abstract class BaseStateMachine<EState> : MonoBehaviour where EState : En
     void Start() {
         _currentState.Enter();
     }
+
+    public void AddState(BaseState<EState> state) {
+        if (!_states.ContainsKey(state.StateKey))
+            _states.Add(state.StateKey, state);
+    }
+
     void Update() {
         EState nextState = _currentState.GetNextState();
 
@@ -23,19 +29,6 @@ public abstract class BaseStateMachine<EState> : MonoBehaviour where EState : En
     }
     void FixedUpdate() {
         _currentState.FixedUpdate();
-    }
-    void OnTriggerEnter(Collider other) {
-        _currentState.OnTriggerEnter(other);
-    }
-    void OnTriggerStay(Collider other) {
-        _currentState.OnTriggerStay(other);
-    }
-    void OnTriggerExit(Collider other) {
-        _currentState.OnTriggerExit(other);
-    }
-    public void AddState(BaseState<EState> state) {
-        if (!_states.ContainsKey(state.StateKey))
-            _states.Add(state.StateKey, state);
     }
     void TransitionToState(EState nextState) {
         _isTransitioning = true;

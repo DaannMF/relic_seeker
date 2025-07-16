@@ -1,45 +1,34 @@
 using UnityEngine;
 
 public class RunState : BaseState<EPlayerStates> {
-    private PlayerStateContext playerContext;
-    private RunSO runData;
+    private new PlayerStateContext Context => base.Context as PlayerStateContext;
+    private new RunSO StateData => base.StateData as RunSO;
 
-    public RunState(PlayerStateContext context, RunSO stateData) : base(EPlayerStates.Run, stateData, context) {
-        playerContext = context;
-        runData = stateData;
-    }
-
-    public override void Enter() {
-        playerContext.Animator.SetBool("isRunning", true);
+    public RunState(PlayerStateContext context, RunSO stateData) :
+        base(EPlayerStates.Run, stateData, context) {
     }
 
     public override void Update() {
-        playerContext.PlayerController.HandleRotation();
-
-        playerContext.PlayerController.HandleDetectControllable();
-
         HandleMovement();
     }
 
     public override void FixedUpdate() {
-        playerContext.ApplyGravity();
+        Context.ApplyGravity();
     }
 
     public override void Exit() {
-        playerContext.Animator.SetBool("isRunning", false);
-
-        Vector3 velocity = playerContext.PlayerController.Rb.velocity;
+        Vector3 velocity = Context.PlayerController.Rb.velocity;
         velocity.x = 0f;
         velocity.z = 0f;
-        playerContext.PlayerController.Rb.velocity = velocity;
+        Context.PlayerController.Rb.velocity = velocity;
     }
 
     public override EPlayerStates GetNextState() {
-        if (playerContext.Input.JumpPressed)
+        if (Context.Input.JumpPressed)
             return EPlayerStates.Jump;
 
-        if (playerContext.Input.IsMoving) {
-            if (playerContext.Input.RunHeld)
+        if (Context.Input.IsMoving) {
+            if (Context.Input.RunHeld)
                 return EPlayerStates.Run;
             else
                 return EPlayerStates.Walk;
@@ -50,19 +39,19 @@ public class RunState : BaseState<EPlayerStates> {
     }
 
     private void HandleMovement() {
-        Vector2 input = playerContext.Input.MovementInput;
+        Vector2 input = Context.Input.MovementInput;
 
         float horizontal = input.x;
         float vertical = input.y;
 
-        Vector3 camForward = playerContext.PlayerController.GetCameraForward();
-        Vector3 camRight = playerContext.PlayerController.GetCameraRight();
+        Vector3 camForward = Context.PlayerController.GetCameraForward();
+        Vector3 camRight = Context.PlayerController.GetCameraRight();
 
         Vector3 moveDir = (camForward * vertical + camRight * horizontal).normalized;
-        Vector3 velocity = new Vector3(moveDir.x * runData.RunSpeed, playerContext.PlayerController.Rb.velocity.y, moveDir.z * runData.RunSpeed);
+        Vector3 velocity = new Vector3(moveDir.x * StateData.RunSpeed, Context.PlayerController.Rb.velocity.y, moveDir.z * StateData.RunSpeed);
 
-        if (playerContext.CanMove(moveDir, runData.MaxAngleMovement)) {
-            playerContext.PlayerController.Rb.velocity = velocity;
+        if (Context.CanMove(moveDir, StateData.MaxAngleMovement)) {
+            Context.PlayerController.Rb.velocity = velocity;
         }
     }
 }

@@ -1,51 +1,36 @@
 using UnityEngine;
-using UnityEngine.Assertions;
 
 public class IdleState : BaseState<EPlayerStates> {
-    private PlayerStateContext playerContext;
-    private IdleSO idleData;
+    private new PlayerStateContext Context => base.Context as PlayerStateContext;
 
-    public IdleState(PlayerStateContext context, IdleSO stateData) : base(EPlayerStates.Idle, stateData, context) {
-        playerContext = context;
-        idleData = stateData;
+    public IdleState(PlayerStateContext context, IdleSO stateData) :
+        base(EPlayerStates.Idle, stateData, context) {
     }
 
-    public override void Enter() {
-        if (idleData.EnableIdleAnimations)
-            playerContext.Animator.SetBool("isIdle", true);
-
-        Vector3 velocity = playerContext.PlayerController.Rb.velocity;
+    public override void OnEnter() {
+        Vector3 velocity = Context.PlayerController.Rb.velocity;
         velocity.x = 0f;
         velocity.z = 0f;
-        playerContext.PlayerController.Rb.velocity = velocity;
+        Context.PlayerController.Rb.velocity = velocity;
     }
 
     public override void Update() {
-        playerContext.PlayerController.HandleRotation();
-
-        playerContext.PlayerController.HandleDetectControllable();
-
-        Vector3 velocity = playerContext.PlayerController.Rb.velocity;
+        Vector3 velocity = Context.PlayerController.Rb.velocity;
         velocity.x = 0f;
         velocity.z = 0f;
-        playerContext.PlayerController.Rb.velocity = velocity;
+        Context.PlayerController.Rb.velocity = velocity;
     }
 
     public override void FixedUpdate() {
-        playerContext.ApplyGravity();
-    }
-
-    public override void Exit() {
-        if (idleData.EnableIdleAnimations)
-            playerContext.Animator.SetBool("isIdle", false);
+        Context.ApplyGravity();
     }
 
     public override EPlayerStates GetNextState() {
-        if (playerContext.Input.JumpPressed)
+        if (Context.Input.JumpPressed)
             return EPlayerStates.Jump;
 
-        if (playerContext.Input.IsMoving) {
-            if (playerContext.Input.RunHeld)
+        if (Context.Input.IsMoving) {
+            if (Context.Input.RunHeld)
                 return EPlayerStates.Run;
 
             return EPlayerStates.Walk;

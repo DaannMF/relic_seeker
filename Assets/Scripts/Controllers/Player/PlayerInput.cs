@@ -1,9 +1,6 @@
 using UnityEngine;
 
 public class PlayerInput : MonoBehaviour {
-    [Header("Mouse Settings")]
-    [SerializeField] private float mouseSensitivity = 100f;
-
     // Input properties
     public Vector2 MovementInput { get; private set; }
     public Vector2 MouseInput { get; private set; }
@@ -20,8 +17,8 @@ public class PlayerInput : MonoBehaviour {
     public bool RunHeld { get; private set; }
     public bool RunReleased { get; private set; }
 
-    // Settings
-    public float MouseSensitivity => mouseSensitivity;
+    // Return to original player
+    public bool ReturnToPlayerPressed { get; private set; }
 
     private void Update() {
         // Get movement input
@@ -42,5 +39,8 @@ public class PlayerInput : MonoBehaviour {
         RunPressed = Input.GetKeyDown(KeyCode.LeftShift);
         RunHeld = Input.GetKey(KeyCode.LeftShift);
         RunReleased = Input.GetKeyUp(KeyCode.LeftShift);
+
+        // Get return to player input (1 key)
+        ReturnToPlayerPressed = Input.GetKeyDown(KeyCode.Alpha1);
     }
 }

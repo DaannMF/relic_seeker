@@ -1,38 +1,55 @@
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class PlayerController : MonoBehaviour {
     [Header("Player Settings")]
-    [SerializeField] private float mouseSensitivity = 2f;
-    [SerializeField] private float maxCameraAngle = 80f;
     [SerializeField] private float detectionRange = 5f;
+    [SerializeField] private float mouseSensitivity = 120f;
+    [SerializeField] private float maxCameraAngle = 80f;
+    [SerializeField] private Transform cameraTransform;
+    [SerializeField] private Transform pivot;
 
     private PlayerInput input;
     private Rigidbody rb;
-    private Transform pivot;
-    private Transform cameraTransform;
-
     private float rotationY;
     private float rotationX;
 
-    public float MouseSensitivity => mouseSensitivity;
-    public float MaxCameraAngle => maxCameraAngle;
-    public float DetectionRange => detectionRange;
+
     public Rigidbody Rb => rb;
 
     private void Awake() {
-        rb = GetComponent<Rigidbody>();
+        rb = transform.parent.GetComponent<Rigidbody>();
         input = GetComponent<PlayerInput>();
 
-        pivot = transform.Find("Pivot");
-        cameraTransform = pivot.Find("Main Camera").transform;
+        ValidateRequiredComponents();
     }
 
     private void Start() {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        rotationY = rb.transform.eulerAngles.y;
+        rotationX = cameraTransform.localEulerAngles.x;
     }
 
-    public void HandleRotation() {
+    private void Update() {
+        HandleCamera();
+        HandleDetectControllable();
+        HandleReturnToPlayer();
+    }
+
+    private void ValidateRequiredComponents() {
+        Assert.IsNotNull(cameraTransform, "Camera Transform is not assigned in PlayerController.");
+        Assert.IsNotNull(pivot, "Pivot Transform is not assigned in PlayerController.");
+    }
+
+    private void OnDrawGizmos() {
+        Gizmos.color = Color.red;
+        Gizmos.DrawRay(Camera.main.transform.position, Camera.main.transform.forward * detectionRange);
+    }
+
+    private void HandleCamera() {
+
         Vector2 mouseInput = input.MouseInput;
         float mouseX = mouseInput.x * mouseSensitivity * Time.deltaTime;
         float mouseY = mouseInput.y * mouseSensitivity * Time.deltaTime;
@@ -47,31 +64,50 @@ public class PlayerController : MonoBehaviour {
     }
 
     public void HandleDetectControllable() {
-#if UNITY_EDITOR
-        Debug.DrawRay(cameraTransform.position, cameraTransform.forward * detectionRange, Color.red);
-#endif
-
-        if (input.InteractPressed) {
-            if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit hit, detectionRange)) {
-                if (hit.collider.transform.parent.TryGetComponent(out Controllable controllable)) {
+        int layer = LayerMask.GetMask("Controllable");
+        if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out RaycastHit hit, detectionRange, layer)) {
+            if (hit.collider.transform.parent.TryGetComponent(out Controllable controllable))
+                if (input.InteractPressed)
                     controllable.ControlEntity(this);
-                }
-                else {
-                    Debug.Log("No controllable entity found.");
-                }
-            }
+                else
+                    controllable.OutlineEntity();
+        }
+    }
+
+    private void HandleReturnToPlayer() {
+        if (input.ReturnToPlayerPressed) {
+            Controllable.ReturnToOriginalPlayer(this);
         }
     }
 
     public Vector3 GetCameraForward() {
-        Vector3 forward = cameraTransform.forward;
+        Vector3 forward = Camera.main.transform.forward;
         forward.y = 0f;
         return forward.normalized;
     }
 
     public Vector3 GetCameraRight() {
-        Vector3 right = cameraTransform.right;
+        Vector3 right = Camera.main.transform.right;
         right.y = 0f;
         return right.normalized;
+    }
+
+    public void RefreshReferences() {
+        rb = transform.parent.GetComponent<Rigidbody>();
+
+        // Reset rotation variables with new entity's rotation
+        if (rb != null) {
+            rotationY = rb.transform.eulerAngles.y;
+            rotationX = cameraTransform.localEulerAngles.x;
+
+            // Handle case where rotationX might be > 180 (Unity's angle representation)
+            if (rotationX > 180f) {
+                rotationX -= 360f;
+            }
+        }
+    }
+
+    public void SetCameraPosition(Vector3 newPosition) {
+        cameraTransform.localPosition = newPosition;
     }
 }

@@ -1,39 +1,27 @@
-using UnityEngine;
-
 public class EnemyIdleState : BaseState<EEnemyStates> {
-    private EnemyStateContext enemyContext;
-    private EnemyIdleSO idleData;
+    private new EnemyStateContext Context => base.Context as EnemyStateContext;
+    private new EnemyIdleSO StateData => base.StateData as EnemyIdleSO;
 
-    public EnemyIdleState(EnemyStateContext context, EnemyIdleSO stateData) : base(EEnemyStates.Idle, stateData, context) {
-        enemyContext = context;
-        idleData = stateData;
+    public EnemyIdleState(EnemyStateContext context, EnemyIdleSO stateData) :
+        base(EEnemyStates.Idle, stateData, context) {
     }
 
-    public override void Enter() {
-        enemyContext.Animator.SetBool("isIdle", true);
-        enemyContext.EnemyController.StopMovement();
-        enemyContext.ResetStateTimer();
-
-        if (Random.value < idleData.lookAroundChance) {
-            enemyContext.Animator.SetTrigger("lookAround");
-        }
+    public override void OnEnter() {
+        Context.EnemyController.StopMovement();
+        Context.ResetStateTimer();
     }
 
     public override void Update() {
-        enemyContext.UpdateStateTimer();
-    }
-
-    public override void Exit() {
-        enemyContext.Animator.SetBool("isIdle", false);
+        Context.UpdateStateTimer();
     }
 
     public override EEnemyStates GetNextState() {
-        if (enemyContext.EnemyController.CanSeePlayer()) {
+        if (Context.EnemyController.CanSeePlayer()) {
             return EEnemyStates.Chase;
         }
 
-        if (enemyContext.StateTimer >= idleData.idleTime) {
-            if (enemyContext.EnemyController.PatrolPoints != null && enemyContext.EnemyController.PatrolPoints.Length > 0) {
+        if (Context.StateTimer >= StateData.idleTime) {
+            if (Context.EnemyController.PatrolPoints != null && Context.EnemyController.PatrolPoints.Length > 0) {
                 return EEnemyStates.Patrol;
             }
         }

@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class PlayerStateContext : BaseStateContext<EPlayerStates> {
     private PlayerInput input;
-    private Animator animator;
     private PlayerController playerController;
 
     // Gravity settings (shared across states)
@@ -11,19 +10,14 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
 
     // Properties
     public PlayerInput Input => input;
-    public Animator Animator => animator;
     public PlayerController PlayerController => playerController;
 
     public PlayerStateContext(PlayerInput input, Animator animator, PlayerController playerController) {
         this.input = input;
-        this.animator = animator;
+        this._animator = animator;
         this.playerController = playerController;
         this.gravity = 20f;
         this.maxFallSpeed = 15f;
-    }
-
-    public void SetPlayerController(PlayerController controller) {
-        this.playerController = controller;
     }
 
     public void SetGravitySettings(float gravity, float maxFallSpeed) {
@@ -43,7 +37,7 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
     }
 
     public bool IsGrounded(float checkDistance = 0.1f, LayerMask groundMask = default) {
-        if (groundMask == default) groundMask = 1; // Default to layer 0
+        if (groundMask == default) groundMask = 1;
 
         Vector3 rayOrigin = playerController.Rb.position + Vector3.up * 0.1f;
         Ray ray = new Ray(rayOrigin, Vector3.down);
@@ -57,8 +51,6 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
 
         return isGrounded;
     }
-
-
 
     public bool CanMove(Vector3 moveDir, float maxAngleMovement) {
         Terrain terrain = Terrain.activeTerrain;

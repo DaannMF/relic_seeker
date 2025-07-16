@@ -1,2 +1,6 @@
 using System;
-public abstract class BaseStateContext<EState> where EState : Enum { }
+using UnityEngine;
+
+public abstract class BaseStateContext<EState> where EState : Enum {
+    public Animator _animator;
+}

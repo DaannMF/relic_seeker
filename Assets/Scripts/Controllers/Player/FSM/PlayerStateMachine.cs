@@ -7,16 +7,13 @@ public class PlayerStateMachine : BaseStateMachine<EPlayerStates> {
     [SerializeField] private PlayerInput _input;
     [SerializeField] private Animator _animator;
 
-    [Header("References")]
-    [SerializeField] private Transform pivot;
-    [SerializeField] private Transform cameraTransform;
 
     private PlayerStateContext _context;
     private PlayerController _playerController;
 
     void Awake() {
         if (_input == null) _input = GetComponent<PlayerInput>();
-        if (_animator == null) _animator = GetComponent<Animator>();
+        if (_animator == null) _animator = transform.parent.GetComponentInChildren<Animator>();
         _playerController = GetComponent<PlayerController>();
 
         ValidateRequiredComponents();
@@ -29,8 +26,6 @@ public class PlayerStateMachine : BaseStateMachine<EPlayerStates> {
         Assert.IsNotNull(_input, "PlayerInput is not assigned in PlayerStateMachine.");
         Assert.IsNotNull(_animator, "Animator is not assigned in PlayerStateMachine.");
         Assert.IsNotNull(_playerController, "PlayerController is not assigned in PlayerStateMachine.");
-        Assert.IsNotNull(pivot, "Pivot Transform is not assigned in PlayerStateMachine.");
-        Assert.IsNotNull(cameraTransform, "Camera Transform is not assigned in PlayerStateMachine.");
     }
 
     private void Initialize() {
@@ -38,5 +33,15 @@ public class PlayerStateMachine : BaseStateMachine<EPlayerStates> {
             AddState(stateData.GetState(_context));
 
         _currentState = _states[EPlayerStates.Idle];
+    }
+
+    // Method to refresh Animator reference when controlling different entities
+    public void RefreshAnimatorReference() {
+        _animator = transform.parent.GetComponentInChildren<Animator>();
+        if (_context != null) {
+            _context._animator = _animator;
+        }
+
+        ValidateRequiredComponents();
     }
 }
