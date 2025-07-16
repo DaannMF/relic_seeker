@@ -13,9 +13,10 @@ public class PlayerController : MonoBehaviour {
     private Rigidbody rb;
     private float rotationY;
     private float rotationX;
-
+    private bool isInInterior = false;
 
     public Rigidbody Rb => rb;
+    public bool IsInInterior => isInInterior;
 
     private void Awake() {
         rb = transform.parent.GetComponent<Rigidbody>();
@@ -109,5 +110,9 @@ public class PlayerController : MonoBehaviour {
 
     public void SetCameraPosition(Vector3 newPosition) {
         cameraTransform.localPosition = newPosition;
+    }
+
+    public void SetIsInInterior(bool isInInterior) {
+        this.isInInterior = isInInterior;
     }
 }

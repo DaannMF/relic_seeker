@@ -9,17 +9,14 @@ public class WalkState : BaseState<EPlayerStates> {
     }
 
     public override void Update() {
-        // Handle movement
         HandleMovement();
     }
 
     public override void FixedUpdate() {
-        // Apply gravity to keep player grounded
         Context.ApplyGravity();
     }
 
     public override void Exit() {
-        // Reset horizontal velocity when exiting walk state
         Vector3 velocity = Context.PlayerController.Rb.velocity;
         velocity.x = 0f;
         velocity.z = 0f;
@@ -27,12 +24,10 @@ public class WalkState : BaseState<EPlayerStates> {
     }
 
     public override EPlayerStates GetNextState() {
-        // Check for jump input first (highest priority)
         if (Context.Input.JumpPressed) {
             return EPlayerStates.Jump;
         }
 
-        // Then check for movement
         if (Context.Input.IsMoving) {
 
             if (Context.Input.RunHeld)
@@ -42,7 +37,6 @@ public class WalkState : BaseState<EPlayerStates> {
             return EPlayerStates.Walk;
         }
 
-        // No movement, go to idle
         return EPlayerStates.Idle;
     }
 

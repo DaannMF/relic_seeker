@@ -4,11 +4,9 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
     private PlayerInput input;
     private PlayerController playerController;
 
-    // Gravity settings (shared across states)
     private float gravity;
     private float maxFallSpeed;
 
-    // Properties
     public PlayerInput Input => input;
     public PlayerController PlayerController => playerController;
 
@@ -53,6 +51,8 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
     }
 
     public bool CanMove(Vector3 moveDir, float maxAngleMovement) {
+        if (playerController.IsInInterior) return true;
+
         Terrain terrain = Terrain.activeTerrain;
         if (terrain == null) return true;
 
@@ -65,6 +65,7 @@ public class PlayerStateContext : BaseStateContext<EPlayerStates> {
 
         if (angle > maxAngleMovement && nextHeight > currentHeight)
             return false;
+
         return true;
     }
 
