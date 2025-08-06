@@ -15,15 +15,11 @@ public class KeyCounterUI : MonoBehaviour {
     private int currentKeyCount = 0;
 
     private void Start() {
-        Debug.Log("[KeyCounterUI] Starting initialization");
-
         // Subscribe to key count changes
         InventoryEvents.OnKeyCountChanged += OnKeyCountChanged;
-        Debug.Log("[KeyCounterUI] Subscribed to OnKeyCountChanged");
 
         // Get initial key count
         InventoryEvents.OnGetKeyCount?.Invoke(OnInitialKeyCountReceived);
-        Debug.Log("[KeyCounterUI] Requested initial key count");
 
         // Auto-detect UI elements if not assigned
         AutoDetectUIElements();
@@ -32,7 +28,6 @@ public class KeyCounterUI : MonoBehaviour {
     private void OnDestroy() {
         // Unsubscribe from events
         InventoryEvents.OnKeyCountChanged -= OnKeyCountChanged;
-        Debug.Log("[KeyCounterUI] Unsubscribed from events");
     }
 
     private void AutoDetectUIElements() {
@@ -56,39 +51,28 @@ public class KeyCounterUI : MonoBehaviour {
         if (keyCounterPanel == null) {
             keyCounterPanel = gameObject;
         }
-
-        Debug.Log($"[KeyCounterUI] UI Elements - Text: {(keyCountText != null ? "Found" : "Missing")}, Panel: {(keyCounterPanel != null ? "Found" : "Missing")}");
     }
 
     private void OnInitialKeyCountReceived(int keyCount) {
-        Debug.Log($"[KeyCounterUI] Received initial key count: {keyCount}");
         currentKeyCount = keyCount;
         UpdateDisplay();
     }
 
     private void OnKeyCountChanged(int newKeyCount) {
-        Debug.Log($"[KeyCounterUI] Key count changed: {currentKeyCount} → {newKeyCount}");
         currentKeyCount = newKeyCount;
         UpdateDisplay();
     }
 
     private void UpdateDisplay() {
-        Debug.Log($"[KeyCounterUI] Updating display with {currentKeyCount} keys");
-
         // Update text
         if (keyCountText != null) {
             string newText = string.Format(keyCountFormat, currentKeyCount);
             keyCountText.text = newText;
-            Debug.Log($"[KeyCounterUI] Updated text to: '{newText}'");
-        }
-        else {
-            Debug.LogWarning("[KeyCounterUI] keyCountText is null - cannot update display");
         }
 
         // Handle visibility
         if (hideWhenZeroKeys && keyCounterPanel != null) {
             keyCounterPanel.SetActive(currentKeyCount > 0);
-            Debug.Log($"[KeyCounterUI] Panel visibility: {keyCounterPanel.activeSelf}");
         }
     }
 

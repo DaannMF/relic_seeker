@@ -158,7 +158,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 716465521}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &350827740
 MonoBehaviour:
@@ -230,8 +230,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 350827739}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &986431311 stripped
@@ -310,6 +309,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 254814716763646493, guid: ae586a174f0d343b0b6582f0a31035f8, type: 3}
       propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 443255073022783709, guid: ae586a174f0d343b0b6582f0a31035f8, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 443255073022783709, guid: ae586a174f0d343b0b6582f0a31035f8, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 443255073022783709, guid: ae586a174f0d343b0b6582f0a31035f8, type: 3}
+      propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 448965172606464689, guid: ae586a174f0d343b0b6582f0a31035f8, type: 3}
@@ -460,6 +471,10 @@ PrefabInstance:
       propertyPath: promptText
       value: 
       objectReference: {fileID: 1015196469}
+    - target: {fileID: 3557926968329353781, guid: ae586a174f0d343b0b6582f0a31035f8, type: 3}
+      propertyPath: cursorTexture
+      value: 
+      objectReference: {fileID: 2800000, guid: 80201dd4a01a949e7aad5eecef51a739, type: 3}
     - target: {fileID: 3557926968329353781, guid: ae586a174f0d343b0b6582f0a31035f8, type: 3}
       propertyPath: mainMenuPanel
       value: 
@@ -1135,3 +1150,4 @@ SceneRoots:
   - {fileID: 1883304515}
   - {fileID: 716465521}
   - {fileID: 1699936365}
+  - {fileID: 350827739}

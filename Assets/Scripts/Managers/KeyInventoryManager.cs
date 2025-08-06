@@ -15,7 +15,6 @@ public class KeyInventoryManager : MonoBehaviour {
             Instance = this;
             DontDestroyOnLoad(gameObject);
             LoadKeysFromPrefs();
-            Debug.Log($"[KeyInventoryManager] Initialized with {currentKeys} keys");
         }
         else {
             Destroy(gameObject);
@@ -24,7 +23,6 @@ public class KeyInventoryManager : MonoBehaviour {
 
     private void Start() {
         SubscribeToEvents();
-        Debug.Log("[KeyInventoryManager] Subscribed to events");
     }
 
     private void OnDestroy() {
@@ -61,7 +59,6 @@ public class KeyInventoryManager : MonoBehaviour {
             int oldKeys = currentKeys;
             currentKeys += amount;
             SaveKeysToPrefs();
-            Debug.Log($"[KeyInventoryManager] Added {amount} keys: {oldKeys} → {currentKeys}");
             InventoryEvents.OnKeyCountChanged?.Invoke(currentKeys);
         }
     }
@@ -71,7 +68,6 @@ public class KeyInventoryManager : MonoBehaviour {
             int oldKeys = currentKeys;
             currentKeys = Mathf.Max(0, currentKeys - amount);
             SaveKeysToPrefs();
-            Debug.Log($"[KeyInventoryManager] Removed {amount} keys: {oldKeys} → {currentKeys}");
             InventoryEvents.OnKeyCountChanged?.Invoke(currentKeys);
         }
     }
@@ -80,12 +76,10 @@ public class KeyInventoryManager : MonoBehaviour {
         int oldKeys = currentKeys;
         currentKeys = Mathf.Max(0, amount);
         SaveKeysToPrefs();
-        Debug.Log($"[KeyInventoryManager] Set keys: {oldKeys} → {currentKeys}");
         InventoryEvents.OnKeyCountChanged?.Invoke(currentKeys);
     }
 
     private void GetKeyCount(System.Action<int> callback) {
-        Debug.Log($"[KeyInventoryManager] GetKeyCount requested: {currentKeys}");
         callback?.Invoke(currentKeys);
     }
 

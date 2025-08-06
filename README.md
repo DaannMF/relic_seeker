@@ -60,3 +60,12 @@ UI:
     ● Debe haber un panel de settings en el que se modifique el audio.
     ● Se debe poder volver al menú principal.
     ● Se debe poder poner pausa.
+
+Para el final
+
+Agregar dificultad para las escenas de interiores
+Que el controllable no pueda empujar al player
+Win condition
+Tercer nivel
+Cantidad de Saltos o stamina
+Que el player no pueda saltar por el terrain

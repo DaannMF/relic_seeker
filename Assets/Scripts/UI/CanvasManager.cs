@@ -9,6 +9,7 @@ public class CanvasManager : MonoBehaviour {
     [SerializeField] private GameObject mainMenuPanel;
     [SerializeField] private GameObject hudPanel;
     [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private Texture2D cursorTexture;
 
     private void Awake() {
         if (Instance == null) {
@@ -18,6 +19,10 @@ public class CanvasManager : MonoBehaviour {
         else {
             Destroy(gameObject);
         }
+
+        Cursor.SetCursor(cursorTexture, new Vector2(cursorTexture.width / 2, cursorTexture.height / 2), CursorMode.Auto);
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.Confined;
     }
 
     private void Start() {
@@ -47,6 +52,10 @@ public class CanvasManager : MonoBehaviour {
     }
 
     private void HandleGameStateChanged(GameState newState) {
+        Cursor.lockState = CursorLockMode.Locked;
+
+        Debug.Log($"Cursor visible: {Cursor.visible}, lockState: {Cursor.lockState} ");
+
         switch (newState) {
             case GameState.MainMenu:
                 ShowMainMenu();
@@ -65,6 +74,8 @@ public class CanvasManager : MonoBehaviour {
     }
 
     public void ShowMainMenu() {
+        Cursor.lockState = CursorLockMode.Confined;
+
         if (mainMenuPanel != null) {
             mainMenuPanel.SetActive(true);
         }

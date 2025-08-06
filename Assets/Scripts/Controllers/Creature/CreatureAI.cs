@@ -13,17 +13,11 @@ public class SlimeAI : MonoBehaviour {
     [SerializeField] private float minSoundInterval = 5f;
     [SerializeField] private float maxSoundInterval = 15f;
 
-
-
-    private CreatureController creatureController;
-    private CreatureStateMachine stateMachine;
     private Animator animator;
     private AudioSource audioSource;
     private float nextSoundTime;
 
     private void Awake() {
-        creatureController = GetComponent<CreatureController>();
-        stateMachine = GetComponent<CreatureStateMachine>();
         animator = GetComponent<Animator>();
         audioSource = GetComponent<AudioSource>();
 

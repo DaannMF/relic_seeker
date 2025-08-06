@@ -114,34 +114,24 @@ public class GameController : MonoBehaviour {
         switch (newState) {
             case GameState.Paused:
                 Time.timeScale = 0f; // Pause the game
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
                 GameEvents.OnGamePaused?.Invoke();
                 break;
             case GameState.Playing:
-                Time.timeScale = 1f; // Resume the game
-                Cursor.lockState = CursorLockMode.Locked;
-                Cursor.visible = false;
+                Time.timeScale = 1f;
                 if (previousState == GameState.Paused) {
                     GameEvents.OnGameResumed?.Invoke();
                 }
                 break;
             case GameState.Won:
                 Time.timeScale = 0f; // Pause on game over
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
                 GameEvents.OnGameWon?.Invoke();
                 break;
             case GameState.Lost:
                 Time.timeScale = 0f; // Pause on game over
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
                 GameEvents.OnGameLost?.Invoke();
                 break;
             case GameState.MainMenu:
                 Time.timeScale = 1f; // Ensure normal time in menu
-                Cursor.lockState = CursorLockMode.None;
-                Cursor.visible = true;
                 GameEvents.OnReturnToMainMenu?.Invoke();
                 break;
         }

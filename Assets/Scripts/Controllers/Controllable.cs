@@ -9,6 +9,9 @@ public class Controllable : MonoBehaviour, IControllable {
     [Header("UI Settings")]
     [SerializeField] private string controlPromptMessage = "Press E to control";
 
+    [Header("Outline Settings")]
+    [SerializeField] private OutlineController outlineController;
+
     private static Controllable originalPlayer;
     private static Controllable lastControlledEntity;
     private bool isShowingPrompt = false;
@@ -25,6 +28,11 @@ public class Controllable : MonoBehaviour, IControllable {
                     break;
                 }
             }
+        }
+
+        // Auto-asignar OutlineController si no está asignado
+        if (outlineController == null) {
+            outlineController = GetComponentInChildren<OutlineController>();
         }
     }
 
@@ -53,6 +61,11 @@ public class Controllable : MonoBehaviour, IControllable {
         if (isShowingPrompt) {
             UIEvents.OnPromptHide?.Invoke();
             isShowingPrompt = false;
+        }
+
+        // Ocultar outline cuando se deja de mirar
+        if (outlineController != null) {
+            outlineController.HideOutline();
         }
     }
 
@@ -98,14 +111,8 @@ public class Controllable : MonoBehaviour, IControllable {
     }
 
     public void OutlineEntity() {
-        // if (visualRepresentation == null) return;
-
-        // var _outline = visualRepresentation.GetComponent<Outline>();
-        // if (_outline != null) return;
-
-        // _outline = visualRepresentation.AddComponent<Outline>();
-        // _outline.OutlineColor = Color.red;
-        // _outline.OutlineWidth = 10f;
-        // _outline.OutlineMode = Outline.Mode.OutlineVisible;
+        if (outlineController != null) {
+            outlineController.ShowOutline();
+        }
     }
 }

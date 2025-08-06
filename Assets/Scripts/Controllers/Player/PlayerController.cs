@@ -27,9 +27,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void Start() {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
         rotationY = rb.transform.eulerAngles.y;
         rotationX = cameraTransform.localEulerAngles.x;
     }

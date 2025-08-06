@@ -59,8 +59,8 @@ public class LoadingUISetup : MonoBehaviour {
         progressContainer.transform.SetParent(loadingPanel.transform, false);
 
         RectTransform containerRect = progressContainer.AddComponent<RectTransform>();
-        containerRect.anchorMin = new Vector2(0.2f, 0.3f);  // Moved up from 0.1f to 0.3f
-        containerRect.anchorMax = new Vector2(0.8f, 0.5f);  // Moved up from 0.3f to 0.5f
+        containerRect.anchorMin = new Vector2(0.2f, 0.3f);
+        containerRect.anchorMax = new Vector2(0.8f, 0.5f);
         containerRect.sizeDelta = Vector2.zero;
         containerRect.anchoredPosition = Vector2.zero;
 
@@ -141,16 +141,12 @@ public class LoadingUISetup : MonoBehaviour {
 
         loadingPanel.SetActive(false);
 
-        Debug.Log("[LoadingUISetup] LoadingUI created and configured automatically");
-
         if (CanvasManager.Instance != null) {
             CanvasManager.Instance.SetLoadingUI(loadingUI);
-            Debug.Log("[LoadingUISetup] LoadingUI assigned to CanvasManager");
         }
 
         if (GameSceneManager.Instance != null) {
             GameSceneManager.Instance.SetLoadingUI(loadingUI);
-            Debug.Log("[LoadingUISetup] LoadingUI assigned to GameSceneManager");
         }
     }
 }

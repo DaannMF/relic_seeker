@@ -1,15 +1,13 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public enum AudioType
-{
+public enum AudioType {
     Music,
     UI,
     SFX
 }
 
-public static class AudioEvents
-{
+public static class AudioEvents {
     public static UnityAction<string, AudioType> OnPlayAudio;
     public static UnityAction<string, AudioType, Vector3> OnPlayAudio3D;
     public static UnityAction<string> OnStopAudio;
