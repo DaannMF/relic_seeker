@@ -43,3 +43,18 @@ MonoBehaviour:
     audioType: 2
     loop: 0
     is3D: 0
+  - clipName: Dok_Bark
+    clip: {fileID: 8300000, guid: 95d601c4f567f47aeab8fc44e2f0a364, type: 3}
+    audioType: 2
+    loop: 0
+    is3D: 1
+  - clipName: Lever_Activate
+    clip: {fileID: 8300000, guid: 184d209369e09458c9d3a281e4b22c2b, type: 3}
+    audioType: 2
+    loop: 0
+    is3D: 0
+  - clipName: Fence_Open
+    clip: {fileID: 8300000, guid: d72e34e925f364b7583314bfeb42835a, type: 3}
+    audioType: 2
+    loop: 0
+    is3D: 0

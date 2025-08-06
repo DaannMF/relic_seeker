@@ -25,7 +25,7 @@ public class InteriorExit : MonoBehaviour {
                 ExitInterior();
             }
             else {
-                UIEvents.OnPromptShow.Invoke("Press E to exit");
+                UpdatePrompt();
             }
         }
     }
@@ -48,7 +48,24 @@ public class InteriorExit : MonoBehaviour {
         }
     }
 
+    private void UpdatePrompt() {
+        if (!playerInRange) return;
+
+        // Check if current entity is the original player
+        if (!IsOriginalPlayer()) {
+            UIEvents.OnPromptShow?.Invoke("Can't exit while controlling entity");
+            return;
+        }
+
+        UIEvents.OnPromptShow?.Invoke("Press E to exit");
+    }
+
     private void ExitInterior() {
+        // Check if current entity is the original player
+        if (!IsOriginalPlayer()) {
+            return; // Don't allow exiting while controlling another entity
+        }
+
         if (GameSceneManager.Instance != null) {
             UIEvents.OnPromptHide.Invoke();
             GameSceneManager.Instance.ExitInterior();
@@ -74,5 +91,12 @@ public class InteriorExit : MonoBehaviour {
         UnityEditor.Handles.Label(transform.position + Vector3.up * 1.5f,
             $"Interior Exit\nAuto Exit: {(autoExit ? "Yes" : "No")}");
 #endif
+    }
+
+    private bool IsOriginalPlayer() {
+        if (currentPlayer == null) return false;
+
+        Controllable controllable = currentPlayer.transform.parent.GetComponent<Controllable>();
+        return controllable != null && controllable.IsOriginalPlayer();
     }
 }

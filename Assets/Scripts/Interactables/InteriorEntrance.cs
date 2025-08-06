@@ -74,6 +74,12 @@ public class InteriorEntrance : MonoBehaviour {
     private void UpdatePrompt() {
         if (!playerInRange) return;
 
+        // Check if current entity is the original player
+        if (!IsOriginalPlayer()) {
+            UIEvents.OnPromptShow?.Invoke("Can't enter while controlling entity");
+            return;
+        }
+
         if (requiredKeys == 0) {
             // No keys required
             UIEvents.OnPromptShow?.Invoke("Press E to enter");
@@ -89,6 +95,11 @@ public class InteriorEntrance : MonoBehaviour {
     }
 
     private void TryEnterInterior() {
+        // Check if current entity is the original player
+        if (!IsOriginalPlayer()) {
+            return; // Don't allow entering while controlling another entity
+        }
+
         if (requiredKeys > 0 && playerCurrentKeys < requiredKeys) {
             // Not enough keys - could add error feedback here
             return;
@@ -137,5 +148,12 @@ public class InteriorEntrance : MonoBehaviour {
         UnityEditor.Handles.Label(transform.position + Vector3.up * 1.5f,
             $"Interior Entrance\nScene: {interiorSceneName}\nSpawn ID: {(string.IsNullOrEmpty(spawnPointID) ? "Default" : spawnPointID)}\n{accessLevel}");
 #endif
+    }
+
+    private bool IsOriginalPlayer() {
+        if (currentPlayer == null) return false;
+
+        Controllable controllable = currentPlayer.transform.parent.GetComponent<Controllable>();
+        return controllable != null && controllable.IsOriginalPlayer();
     }
 }

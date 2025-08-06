@@ -115,4 +115,8 @@ public class Controllable : MonoBehaviour, IControllable {
             outlineController.ShowOutline();
         }
     }
+
+    public bool IsOriginalPlayer() {
+        return isOriginalPlayer;
+    }
 }
