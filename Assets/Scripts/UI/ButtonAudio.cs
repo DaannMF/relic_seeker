@@ -17,14 +17,12 @@ public class ButtonAudio : MonoBehaviour, IPointerEnterHandler, IPointerClickHan
     }
 
     public void OnPointerEnter(PointerEventData eventData) {
-        if (playHoverSound && button != null && button.interactable) {
+        if (playHoverSound && button != null && button.interactable)
             AudioEvents.OnPlayAudio?.Invoke(BUTTON_HOVER_AUDIO, AudioType.UI);
-        }
     }
 
     public void OnPointerClick(PointerEventData eventData) {
-        if (playClickSound && button != null && button.interactable) {
+        if (playClickSound && button != null && button.interactable)
             AudioEvents.OnPlayAudio?.Invoke(BUTTON_CLICK_AUDIO, AudioType.UI);
-        }
     }
 }

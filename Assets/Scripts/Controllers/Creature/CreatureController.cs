@@ -64,11 +64,6 @@ public class CreatureController : MonoBehaviour {
         return horizontalDistance.magnitude <= threshold;
     }
 
-    private bool IsGroundAhead(Vector3 direction) {
-        Vector3 rayOrigin = transform.position + Vector3.up * 0.5f + direction * 0.5f;
-        return Physics.Raycast(rayOrigin, Vector3.down, groundCheckDistance, groundMask);
-    }
-
     public bool IsWithinRadius(Vector3 position) {
         Vector3 distance = position - _startPosition;
         distance.y = 0f;

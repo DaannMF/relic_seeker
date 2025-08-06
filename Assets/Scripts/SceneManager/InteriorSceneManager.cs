@@ -13,7 +13,6 @@ public class InteriorSceneManager : MonoBehaviour {
     private Quaternion originalPlayerRotation;
     private PlayerController playerController;
 
-    // Events
     public System.Action<string> OnInteriorEntered;
     public System.Action<string> OnInteriorExited;
 
@@ -34,48 +33,30 @@ public class InteriorSceneManager : MonoBehaviour {
     }
 
     public void EnterInterior(string sceneName, string spawnPointID = "") {
-        if (string.IsNullOrEmpty(sceneName)) {
-            Debug.LogError("Scene name cannot be null or empty!");
-            return;
-        }
+        if (string.IsNullOrEmpty(sceneName)) return;
 
-        // Find player
-        if (playerController == null) {
+        if (playerController == null)
             playerController = FindObjectOfType<PlayerController>();
-        }
 
-        if (playerController == null) {
-            Debug.LogError("PlayerController not found!");
-            return;
-        }
+        if (playerController == null) return;
 
-        // Store current position for return
         originalPlayerPosition = playerController.transform.parent.position;
 
         StartCoroutine(LoadInteriorScene(sceneName, spawnPointID));
     }
 
     public void ExitInterior() {
-        if (string.IsNullOrEmpty(currentInteriorScene)) {
-            Debug.LogWarning("No interior scene to exit from!");
-            return;
-        }
-
+        if (string.IsNullOrEmpty(currentInteriorScene)) return;
         StartCoroutine(UnloadInteriorScene());
     }
 
     private IEnumerator LoadInteriorScene(string sceneName, string spawnPointID) {
-        // Show loading UI
-        if (loadingUI != null) {
+        if (loadingUI != null)
             loadingUI.ShowLoadingScreen();
-        }
 
-        // Disable player temporarily
-        if (playerController != null) {
+        if (playerController != null)
             playerController.enabled = false;
-        }
 
-        // Start loading the scene additively
         AsyncOperation loadOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
         loadOperation.allowSceneActivation = false;
 
@@ -89,9 +70,8 @@ public class InteriorSceneManager : MonoBehaviour {
             float realProgress = loadOperation.progress / 0.9f;
             float displayProgress = Mathf.Min(fakeProgress, realProgress);
 
-            if (loadingUI != null) {
+            if (loadingUI != null)
                 loadingUI.UpdateProgress(displayProgress);
-            }
 
             yield return null;
         }
@@ -106,36 +86,26 @@ public class InteriorSceneManager : MonoBehaviour {
             playerController.transform.parent.rotation = spawnPoint.Rotation;
             playerController.SetIsInInterior(true);
         }
-        else {
-            Debug.LogWarning($"No suitable spawn point found in scene {sceneName}. Player will remain at current position.");
-        }
 
-        if (playerController != null) {
+        if (playerController != null)
             playerController.enabled = true;
-        }
 
-        if (loadingUI != null) {
+        if (loadingUI != null)
             loadingUI.HideLoadingScreen();
-        }
 
         currentInteriorScene = sceneName;
         OnInteriorEntered?.Invoke(sceneName);
-
-        Debug.Log($"Entered interior: {sceneName}");
     }
 
     private IEnumerator UnloadInteriorScene() {
-        if (string.IsNullOrEmpty(currentInteriorScene)) {
+        if (string.IsNullOrEmpty(currentInteriorScene))
             yield break;
-        }
 
-        if (loadingUI != null) {
+        if (loadingUI != null)
             loadingUI.ShowLoadingScreen();
-        }
 
-        if (playerController != null) {
+        if (playerController != null)
             playerController.enabled = false;
-        }
 
         float progress = 0f;
         float startTime = Time.time;
@@ -144,9 +114,8 @@ public class InteriorSceneManager : MonoBehaviour {
         while (progress < 1f || (Time.time - startTime) < minLoadTime) {
             progress += Time.deltaTime * 1.5f;
 
-            if (loadingUI != null) {
+            if (loadingUI != null)
                 loadingUI.UpdateProgress(progress);
-            }
 
             yield return null;
         }
@@ -161,37 +130,28 @@ public class InteriorSceneManager : MonoBehaviour {
             playerController.SetIsInInterior(false);
         }
 
-        if (loadingUI != null) {
+        if (loadingUI != null)
             loadingUI.HideLoadingScreen();
-        }
 
         string exitedScene = currentInteriorScene;
         currentInteriorScene = "";
         OnInteriorExited?.Invoke(exitedScene);
-
-        Debug.Log($"Exited interior: {exitedScene}");
     }
 
     private InteriorSpawnPoint FindSpawnPoint(string spawnPointID) {
         InteriorSpawnPoint[] allSpawnPoints = FindObjectsOfType<InteriorSpawnPoint>();
 
-        if (allSpawnPoints.Length == 0) {
+        if (allSpawnPoints.Length == 0)
             return null;
-        }
 
-        if (!string.IsNullOrEmpty(spawnPointID)) {
-            foreach (var spawnPoint in allSpawnPoints) {
-                if (spawnPoint.SpawnPointID == spawnPointID) {
+        if (!string.IsNullOrEmpty(spawnPointID))
+            foreach (var spawnPoint in allSpawnPoints)
+                if (spawnPoint.SpawnPointID == spawnPointID)
                     return spawnPoint;
-                }
-            }
-        }
 
-        foreach (var spawnPoint in allSpawnPoints) {
-            if (spawnPoint.PointType == SpawnPointType.Entrance) {
+        foreach (var spawnPoint in allSpawnPoints)
+            if (spawnPoint.PointType == SpawnPointType.Entrance)
                 return spawnPoint;
-            }
-        }
 
         return allSpawnPoints[0];
     }

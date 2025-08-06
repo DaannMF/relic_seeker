@@ -82,9 +82,8 @@ public class DogController : MonoBehaviour {
     }
 
     public void PlayBarkSound() {
-        if (audioSourcePosition != null && !string.IsNullOrEmpty(barkAudioClip)) {
+        if (audioSourcePosition != null && !string.IsNullOrEmpty(barkAudioClip))
             AudioEvents.OnPlayAudio3D?.Invoke(barkAudioClip, AudioType.SFX, audioSourcePosition.position);
-        }
     }
 
     public bool CanSeePlayer() {

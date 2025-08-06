@@ -26,8 +26,6 @@ public class SlimeAI : MonoBehaviour {
             audioSource.spatialBlend = 1f;
             audioSource.volume = 0.5f;
         }
-
-        InitializeSlime();
     }
 
     private void Start() {
@@ -41,11 +39,6 @@ public class SlimeAI : MonoBehaviour {
 
     private void Update() {
         HandleSounds();
-    }
-
-    private void InitializeSlime() {
-        // Slime-specific initialization can go here
-        // For now, we rely on the StateMachine initialization
     }
 
     private void HandleSounds() {
@@ -68,9 +61,5 @@ public class SlimeAI : MonoBehaviour {
 
     private void ScheduleNextSound() {
         nextSoundTime = Time.time + Random.Range(minSoundInterval, maxSoundInterval);
-    }
-
-    public void OnSlimeStateChanged(ECreatureStates newState) {
-        // State change notifications can be handled here if needed
     }
 }

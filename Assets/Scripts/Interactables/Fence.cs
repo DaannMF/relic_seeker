@@ -21,19 +21,17 @@ public class Fence : MonoBehaviour {
     private bool isAnimating = false;
 
     public enum FenceAnimationType {
-        Slide,      // Move up/down or side to side
-        Rotate,     // Rotate like a gate
-        Scale       // Scale down to "disappear"
+        Slide,
+        Rotate,
+        Scale
     }
 
     private void Start() {
-        // Store initial position and rotation as closed state
         if (fenceVisual != null) {
             closedPosition = fenceVisual.transform.localPosition;
             closedRotation = fenceVisual.transform.localEulerAngles;
         }
 
-        // Auto-detect fence visual if not assigned
         if (fenceVisual == null) {
             Transform visual = transform.Find("Visual");
             if (visual != null) {
@@ -43,15 +41,12 @@ public class Fence : MonoBehaviour {
             }
         }
 
-        // Auto-detect fence collider if not assigned
         if (fenceCollider == null) {
             fenceCollider = GetComponent<Collider>();
-            if (fenceCollider == null && fenceVisual != null) {
+            if (fenceCollider == null && fenceVisual != null)
                 fenceCollider = fenceVisual.GetComponent<Collider>();
-            }
         }
 
-        // Set initial state
         SetFenceState(isOpen, false);
     }
 
@@ -61,10 +56,8 @@ public class Fence : MonoBehaviour {
         isOpen = true;
         StartCoroutine(AnimateFence(true));
 
-        // Play open sound
-        if (!string.IsNullOrEmpty(openAudioClip)) {
+        if (!string.IsNullOrEmpty(openAudioClip))
             AudioEvents.OnPlayAudio?.Invoke(openAudioClip, AudioType.SFX);
-        }
     }
 
     public void CloseFence() {
@@ -73,21 +66,17 @@ public class Fence : MonoBehaviour {
         isOpen = false;
         StartCoroutine(AnimateFence(false));
 
-        // Play close sound
-        if (!string.IsNullOrEmpty(closeAudioClip)) {
+        if (!string.IsNullOrEmpty(closeAudioClip))
             AudioEvents.OnPlayAudio?.Invoke(closeAudioClip, AudioType.SFX);
-        }
     }
 
     public void SetFenceState(bool open, bool animate = true) {
         isOpen = open;
 
-        if (animate && Application.isPlaying) {
+        if (animate && Application.isPlaying)
             StartCoroutine(AnimateFence(open));
-        }
-        else {
+        else
             ApplyFenceState(open);
-        }
     }
 
     private void ApplyFenceState(bool open) {
@@ -120,10 +109,8 @@ public class Fence : MonoBehaviour {
             }
         }
 
-        // Enable/disable collider
-        if (fenceCollider != null) {
+        if (fenceCollider != null)
             fenceCollider.enabled = !open;
-        }
     }
 
     private System.Collections.IEnumerator AnimateFence(bool opening) {
@@ -184,20 +171,16 @@ public class Fence : MonoBehaviour {
         fenceVisual.transform.localEulerAngles = targetRot;
         fenceVisual.transform.localScale = targetScale;
 
-        // Enable/disable collider at the end of animation
-        if (fenceCollider != null) {
+        if (fenceCollider != null)
             fenceCollider.enabled = !opening;
-        }
 
         isAnimating = false;
     }
 
     private void OnDrawGizmosSelected() {
-        // Draw fence state indicator
         Gizmos.color = isOpen ? Color.green : Color.red;
         Gizmos.DrawWireCube(transform.position, Vector3.one * 2f);
 
-        // Draw animation direction
         if (fenceVisual != null) {
             Gizmos.color = Color.yellow;
             Vector3 currentPos = Application.isPlaying ? fenceVisual.transform.position : transform.position;

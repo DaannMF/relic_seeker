@@ -17,15 +17,11 @@ public class DogIdleState : BaseState<EDogStates> {
     }
 
     public override EDogStates GetNextState() {
-        // Priority: If player is detected, bark immediately
-        if (Context.CanSeePlayer()) {
+        if (Context.CanSeePlayer())
             return EDogStates.Bark;
-        }
 
-        // Normal behavior when no player around
-        if (Context.StateTimer >= StateData.IdleTime) {
+        if (Context.StateTimer >= StateData.IdleTime)
             return EDogStates.Walk;
-        }
 
         return EDogStates.Idle;
     }

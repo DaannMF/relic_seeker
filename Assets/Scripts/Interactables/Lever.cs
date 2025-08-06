@@ -27,34 +27,24 @@ public class Lever : MonoBehaviour {
     private bool isAnimating = false;
 
     private void Start() {
-        // Ensure the collider is set as trigger
         Collider col = GetComponent<Collider>();
-        if (col != null) {
+        if (col != null)
             col.isTrigger = true;
-        }
 
-        // If no visual representation assigned, try to find one
         if (leverVisual == null) {
             Transform visual = transform.Find("Visual");
-            if (visual != null) {
+            if (visual != null)
                 leverVisual = visual.gameObject;
-            }
-            else if (transform.childCount > 0) {
+            else if (transform.childCount > 0)
                 leverVisual = transform.GetChild(0).gameObject;
-            }
         }
 
-        // Set initial position
-        if (leverVisual != null) {
+        if (leverVisual != null)
             leverVisual.transform.localRotation = Quaternion.Euler(isActivated ? activatedRotation : deactivatedRotation);
-        }
 
-        // Auto-assign OutlineController if not assigned
-        if (outlineController == null) {
+        if (outlineController == null)
             outlineController = GetComponentInChildren<OutlineController>();
-        }
 
-        // Initialize connected fences
         UpdateConnectedFences();
     }
 
@@ -81,30 +71,25 @@ public class Lever : MonoBehaviour {
     private void Update() {
         if (playerInRange && currentPlayer != null && !isAnimating) {
             PlayerInput input = currentPlayer.GetComponent<PlayerInput>();
-            if (input != null && input.InteractPressed) {
+            if (input != null && input.InteractPressed)
                 ToggleLever();
-            }
         }
     }
 
     private void UpdatePrompt() {
         if (!playerInRange) return;
 
-        if (isActivated && canBeDeactivated) {
+        if (isActivated && canBeDeactivated)
             UIEvents.OnPromptShow?.Invoke("Press E to deactivate lever");
-        }
-        else if (!isActivated) {
+        else if (!isActivated)
             UIEvents.OnPromptShow?.Invoke("Press E to activate lever");
-        }
-        else {
+        else
             UIEvents.OnPromptShow?.Invoke("Lever is permanently activated");
-        }
     }
 
     private void ToggleLever() {
         if (isAnimating) return;
 
-        // If already activated and can't be deactivated, do nothing
         if (isActivated && !canBeDeactivated) return;
 
         isActivated = !isActivated;
@@ -112,11 +97,9 @@ public class Lever : MonoBehaviour {
         UpdateConnectedFences();
         UpdatePrompt();
 
-        // Play audio
         string audioClip = isActivated ? activateAudioClip : deactivateAudioClip;
-        if (!string.IsNullOrEmpty(audioClip)) {
+        if (!string.IsNullOrEmpty(audioClip))
             AudioEvents.OnPlayAudio?.Invoke(audioClip, AudioType.SFX);
-        }
     }
 
     private System.Collections.IEnumerator AnimateLever() {
@@ -147,29 +130,23 @@ public class Lever : MonoBehaviour {
 
         foreach (Fence fence in connectedFences) {
             if (fence != null) {
-                if (isActivated) {
+                if (isActivated)
                     fence.OpenFence();
-                }
-                else {
+                else
                     fence.CloseFence();
-                }
             }
         }
     }
 
     private void OnDrawGizmosSelected() {
-        // Draw lever indicator
         Gizmos.color = isActivated ? Color.green : Color.red;
         Gizmos.DrawWireSphere(transform.position, 1f);
 
-        // Draw connections to fences
         if (connectedFences != null) {
             Gizmos.color = Color.yellow;
-            foreach (Fence fence in connectedFences) {
-                if (fence != null) {
+            foreach (Fence fence in connectedFences)
+                if (fence != null)
                     Gizmos.DrawLine(transform.position, fence.transform.position);
-                }
-            }
         }
 
 #if UNITY_EDITOR
@@ -179,14 +156,12 @@ public class Lever : MonoBehaviour {
     }
 
     private void ShowOutline() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.ShowOutline();
-        }
     }
 
     private void HideOutline() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.HideOutline();
-        }
     }
 }

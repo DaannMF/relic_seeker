@@ -18,10 +18,8 @@ public class DogBarkState : BaseState<EDogStates> {
     public override void Update() {
         Context.UpdateStateTimer();
 
-        // Play bark sound at intervals during the bark state
-        if (Context.StateTimer > 0f && (int)(Context.StateTimer / StateData.BarkInterval) > (int)((Context.StateTimer - Time.deltaTime) / StateData.BarkInterval)) {
+        if (Context.StateTimer > 0f && (int)(Context.StateTimer / StateData.BarkInterval) > (int)((Context.StateTimer - Time.deltaTime) / StateData.BarkInterval))
             Context.DogController.PlayBarkSound();
-        }
     }
 
     public override void Exit() {
@@ -29,15 +27,11 @@ public class DogBarkState : BaseState<EDogStates> {
     }
 
     public override EDogStates GetNextState() {
-        // If player is no longer visible, stop barking
-        if (!Context.CanSeePlayer()) {
+        if (!Context.CanSeePlayer())
             return EDogStates.Idle;
-        }
 
-        // Continue barking while player is visible, up to max duration
-        if (Context.StateTimer >= StateData.BarkDuration) {
+        if (Context.StateTimer >= StateData.BarkDuration)
             return EDogStates.Idle;
-        }
 
         return EDogStates.Bark;
     }

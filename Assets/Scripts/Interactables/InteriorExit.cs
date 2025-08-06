@@ -13,14 +13,11 @@ public class InteriorExit : MonoBehaviour {
 
     private void Start() {
         Collider col = GetComponent<Collider>();
-        if (col != null) {
+        if (col != null)
             col.isTrigger = true;
-        }
 
-        // Auto-assign OutlineController if not assigned
-        if (outlineController == null) {
+        if (outlineController == null)
             outlineController = GetComponentInChildren<OutlineController>();
-        }
     }
 
     private void OnTriggerEnter(Collider other) {
@@ -29,14 +26,11 @@ public class InteriorExit : MonoBehaviour {
             playerInRange = true;
             currentPlayer = player;
 
-            if (autoExit) {
+            if (autoExit)
                 ExitInterior();
-            }
-            else {
+            else
                 UpdatePrompt();
-            }
 
-            // Show outline when player enters range
             ShowOutline();
         }
     }
@@ -48,7 +42,6 @@ public class InteriorExit : MonoBehaviour {
             currentPlayer = null;
             UIEvents.OnPromptHide.Invoke();
 
-            // Hide outline when player exits range
             HideOutline();
         }
     }
@@ -65,7 +58,6 @@ public class InteriorExit : MonoBehaviour {
     private void UpdatePrompt() {
         if (!playerInRange) return;
 
-        // Check if current entity is the original player
         if (!IsOriginalPlayer()) {
             UIEvents.OnPromptShow?.Invoke("Can't exit while controlling entity");
             return;
@@ -75,17 +67,12 @@ public class InteriorExit : MonoBehaviour {
     }
 
     private void ExitInterior() {
-        // Check if current entity is the original player
-        if (!IsOriginalPlayer()) {
-            return; // Don't allow exiting while controlling another entity
-        }
+        if (!IsOriginalPlayer())
+            return;
 
         if (GameSceneManager.Instance != null) {
             UIEvents.OnPromptHide.Invoke();
             GameSceneManager.Instance.ExitInterior();
-        }
-        else {
-            Debug.LogWarning("GameSceneManager not found!");
         }
     }
 
@@ -115,14 +102,12 @@ public class InteriorExit : MonoBehaviour {
     }
 
     private void ShowOutline() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.ShowOutline();
-        }
     }
 
     private void HideOutline() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.HideOutline();
-        }
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 public class InteriorEntrance : MonoBehaviour {
     [Header("Interior Settings")]
     [SerializeField] private string interiorSceneName;
-    [SerializeField] private string spawnPointID = ""; // Optional specific spawn point ID
+    [SerializeField] private string spawnPointID = "";
 
     [Header("Key Requirements")]
     [SerializeField] private int requiredKeys = 0;
@@ -17,23 +17,17 @@ public class InteriorEntrance : MonoBehaviour {
     private int playerCurrentKeys = 0;
 
     private void Start() {
-        // Ensure the collider is set as trigger
         Collider col = GetComponent<Collider>();
-        if (col != null) {
+        if (col != null)
             col.isTrigger = true;
-        }
 
-        // Subscribe to key count changes
         InventoryEvents.OnKeyCountChanged += OnKeyCountChanged;
 
-        // Auto-assign OutlineController if not assigned
-        if (outlineController == null) {
+        if (outlineController == null)
             outlineController = GetComponentInChildren<OutlineController>();
-        }
     }
 
     private void OnDestroy() {
-        // Unsubscribe from events
         InventoryEvents.OnKeyCountChanged -= OnKeyCountChanged;
     }
 
@@ -43,10 +37,8 @@ public class InteriorEntrance : MonoBehaviour {
             playerInRange = true;
             currentPlayer = player;
 
-            // Get current key count and update prompt
             InventoryEvents.OnGetKeyCount?.Invoke(OnKeyCountReceived);
 
-            // Show outline when player enters range
             ShowOutline();
         }
     }
@@ -58,18 +50,15 @@ public class InteriorEntrance : MonoBehaviour {
             currentPlayer = null;
             UIEvents.OnPromptHide?.Invoke();
 
-            // Hide outline when player exits range
             HideOutline();
         }
     }
 
     private void Update() {
         if (playerInRange && currentPlayer != null) {
-            // Check for interaction input
             PlayerInput input = currentPlayer.GetComponent<PlayerInput>();
-            if (input != null && input.InteractPressed) {
+            if (input != null && input.InteractPressed)
                 TryEnterInterior();
-            }
         }
     }
 
@@ -88,60 +77,43 @@ public class InteriorEntrance : MonoBehaviour {
     private void UpdatePrompt() {
         if (!playerInRange) return;
 
-        // Check if current entity is the original player
         if (!IsOriginalPlayer()) {
             UIEvents.OnPromptShow?.Invoke("Can't enter while controlling entity");
             return;
         }
 
-        if (requiredKeys == 0) {
-            // No keys required
+        if (requiredKeys == 0)
             UIEvents.OnPromptShow?.Invoke("Press E to enter");
-        }
-        else if (playerCurrentKeys >= requiredKeys) {
-            // Has enough keys - show access level
+        else if (playerCurrentKeys >= requiredKeys)
             UIEvents.OnPromptShow?.Invoke($"Press E to enter (Access Level {requiredKeys})");
-        }
-        else {
-            // Not enough keys - show requirement
+        else
             UIEvents.OnPromptShow?.Invoke($"Need {requiredKeys} master keys (You have {playerCurrentKeys})");
-        }
     }
 
     private void TryEnterInterior() {
-        // Check if current entity is the original player
-        if (!IsOriginalPlayer()) {
-            return; // Don't allow entering while controlling another entity
-        }
-
-        if (requiredKeys > 0 && playerCurrentKeys < requiredKeys) {
-            // Not enough keys - could add error feedback here
+        if (!IsOriginalPlayer())
             return;
-        }
 
-        // Has enough keys or no keys required
+        if (requiredKeys > 0 && playerCurrentKeys < requiredKeys)
+            return;
+
         if (GameSceneManager.Instance != null && !string.IsNullOrEmpty(interiorSceneName)) {
             UIEvents.OnPromptHide?.Invoke();
             GameSceneManager.Instance.LoadInteriorScene(interiorSceneName, spawnPointID);
         }
-        else {
-            Debug.LogWarning("GameSceneManager not found or scene name is empty!");
-        }
     }
 
     private void OnDrawGizmosSelected() {
-        // Draw entrance indicator with different colors based on access level
         Color gizmoColor = requiredKeys switch {
-            0 => Color.cyan,    // Free access
-            1 => Color.yellow,  // Level 1 access
-            2 => Color.red,     // Level 2 access
-            _ => Color.magenta  // Higher levels
+            0 => Color.cyan,
+            1 => Color.yellow,
+            2 => Color.red,
+            _ => Color.magenta
         };
 
         Gizmos.color = gizmoColor;
         Gizmos.DrawWireCube(transform.position, transform.lossyScale);
 
-        // Draw arrow pointing into the entrance
         Vector3 forward = transform.forward;
         Vector3 arrowStart = transform.position - forward * 1f;
         Vector3 arrowEnd = transform.position;
@@ -150,7 +122,6 @@ public class InteriorEntrance : MonoBehaviour {
         Gizmos.DrawLine(arrowEnd, arrowEnd - forward * 0.3f + transform.right * 0.2f);
         Gizmos.DrawLine(arrowEnd, arrowEnd - forward * 0.3f - transform.right * 0.2f);
 
-        // Label with access level information
 #if UNITY_EDITOR
         string accessLevel = requiredKeys switch {
             0 => "Free Access",
@@ -172,14 +143,12 @@ public class InteriorEntrance : MonoBehaviour {
     }
 
     private void ShowOutline() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.ShowOutline();
-        }
     }
 
     private void HideOutline() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.HideOutline();
-        }
     }
 }

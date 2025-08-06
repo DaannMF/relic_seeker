@@ -43,118 +43,69 @@ public class GameSceneManager : MonoBehaviour {
     private void Start() {
         loadingUI = canvasManager.GetComponentInChildren<LoadingUI>();
 
-        ValidateReferences();
-
         currentMainScene = SceneManager.GetActiveScene().name;
 
-        if (currentMainScene.Contains("MainMenu")) {
+        if (currentMainScene.Contains("MainMenu"))
             GameEvents.OnSetGameStateRequested?.Invoke(GameState.MainMenu);
-        }
-    }
-
-    private void ValidateReferences() {
-        if (canvasManager == null) {
-            Debug.LogWarning("[GameSceneManager] CanvasManager reference not assigned! Loading screens might not work properly.");
-        }
     }
 
     public void LoadInteriorScene(string sceneName, string spawnPointID = "") {
-        if (mainSceneEnvironment == null) {
+        if (mainSceneEnvironment == null)
             AutoDetectMainEnvironment();
-        }
-
-        if (mainSceneEnvironment == null) {
-            Debug.LogWarning("[GameSceneManager] No main scene environment found! Performance optimization won't work. Consider tagging your environment GameObject with 'Environment'.");
-        }
 
         StartCoroutine(LoadSceneCoroutine(sceneName, SceneLoadType.Additive, spawnPointID));
     }
 
     public void LoadSingleScene(string sceneName) {
-        Debug.Log($"[GameSceneManager] LoadSingleScene called with: {sceneName}");
-
-        // Check if scene exists in build settings
-#if UNITY_EDITOR
-        int sceneIndex = SceneUtility.GetBuildIndexByScenePath(sceneName);
-        if (sceneIndex == -1) {
-            Debug.LogError($"[GameSceneManager] Scene '{sceneName}' not found in Build Settings! Please add it to Build Settings.");
-            return;
-        }
-#endif
-
-        // Store current timeScale and temporarily restore it for scene loading
         float originalTimeScale = Time.timeScale;
-        if (Time.timeScale == 0f) {
-            Debug.Log("[GameSceneManager] Time is paused, temporarily restoring timeScale for scene loading");
+        if (Time.timeScale == 0f)
             Time.timeScale = 1f;
-        }
 
         StartCoroutine(LoadSceneCoroutineWithTimeScale(sceneName, SceneLoadType.Single, originalTimeScale));
     }
 
     public void ExitInterior() {
-        if (!isInInterior) {
-            Debug.LogWarning("[GameSceneManager] Not currently in an interior scene!");
-            return;
-        }
+        if (!isInInterior) return;
 
         StartCoroutine(ExitInteriorCoroutine());
     }
 
     private IEnumerator LoadSceneCoroutineWithTimeScale(string sceneName, SceneLoadType loadType, float originalTimeScale, string spawnPointID = "") {
-        Debug.Log($"[GameSceneManager] Starting LoadSceneCoroutineWithTimeScale with originalTimeScale: {originalTimeScale}");
-
-        // Ensure time is running for the coroutine to work properly
-        if (Time.timeScale == 0f) {
-            Time.timeScale = 1f;
-        }
+        if (Time.timeScale == 0f) Time.timeScale = 1f;
 
         yield return StartCoroutine(LoadSceneCoroutine(sceneName, loadType, spawnPointID));
 
-        // Restore original timeScale after scene loading is complete
-        Debug.Log($"[GameSceneManager] Scene loading complete, restoring timeScale to: {originalTimeScale}");
         Time.timeScale = originalTimeScale;
     }
 
     private IEnumerator LoadSceneCoroutine(string sceneName, SceneLoadType loadType, string spawnPointID = "") {
-        string loadTypeString = loadType == SceneLoadType.Single ? "Single" : "Additive";
-        string actionString = loadType == SceneLoadType.Single ? "Loading scene" : "Entering interior";
-        Debug.Log($"[GameSceneManager] {actionString} ({loadTypeString}): {sceneName}");
-
-        // Set appropriate loading messages before showing loading screen
         string loadingTypeString = loadType == SceneLoadType.Single ? "single" : "interior_entry";
 
         if (loadingUI != null) {
             loadingUI.SetLoadingType(loadingTypeString);
             loadingUI.ShowLoadingScreen();
         }
-        else if (canvasManager != null) {
+        else if (canvasManager != null)
             canvasManager.ShowLoading(loadingTypeString);
-        }
 
-        if (loadType == SceneLoadType.Additive && playerController != null) {
+        if (loadType == SceneLoadType.Additive && playerController != null)
             playerController.enabled = false;
-        }
 
         if (loadType == SceneLoadType.Additive && mainSceneEnvironment != null) {
-            // Preserve player by moving it out of environment before deactivating
-            if (playerController == null) {
+            if (playerController == null)
                 playerController = FindObjectOfType<PlayerController>();
-            }
 
             if (playerController != null) {
                 originalPlayerPosition = playerController.transform.parent.position;
                 originalPlayerRotation = playerController.transform.parent.rotation;
 
-                Transform playerParent = playerController.transform.parent; // This is the Controllable GameObject
+                Transform playerParent = playerController.transform.parent;
                 if (IsChildOfEnvironment(playerParent, mainSceneEnvironment.transform)) {
-                    Debug.Log($"[GameSceneManager] Moving player out of environment to preserve it during interior entry");
                     originalPlayerParent = playerParent.parent;
                     playerParent.SetParent(null);
                 }
             }
 
-            Debug.Log($"[GameSceneManager] Deactivating environment for interior entry: {mainSceneEnvironment.name}");
             mainSceneEnvironment.SetActive(false);
         }
 
@@ -167,54 +118,43 @@ public class GameSceneManager : MonoBehaviour {
         loadOperation.allowSceneActivation = true;
         yield return loadOperation;
 
-        if (loadType == SceneLoadType.Additive) {
+        if (loadType == SceneLoadType.Additive)
             yield return StartCoroutine(SetupInteriorScene(sceneName, spawnPointID));
-        }
-        else {
+        else
             yield return StartCoroutine(SetupMainScene(sceneName));
-        }
 
-        if (loadingUI != null) {
+        if (loadingUI != null)
             loadingUI.HideLoadingScreen();
-        }
-        else if (canvasManager != null) {
+        else if (canvasManager != null)
             canvasManager.HideLoading();
-        }
-
-        string completedAction = loadType == SceneLoadType.Single ? "Scene loaded" : "Interior entered";
-        Debug.Log($"[GameSceneManager] {completedAction} successfully: {sceneName}");
     }
 
     private IEnumerator FakeLoadingCoroutine(AsyncOperation loadOperation, bool isExit = false) {
-        float fakeProgress = 0f;
-        float loadingTime = isExit ? 3f : 6f; // Shorter loading for exits
+        float fakeProgress;
+        float loadingTime = isExit ? 3f : 6f;
         float elapsedTime = 0f;
 
         while (elapsedTime < loadingTime || loadOperation.progress < 0.9f) {
-            elapsedTime += Time.unscaledDeltaTime; // Use unscaled time to work during pause
+            elapsedTime += Time.unscaledDeltaTime;
             fakeProgress = Mathf.Clamp01(elapsedTime / loadingTime);
 
             float realProgress = Mathf.Clamp01(loadOperation.progress / 0.9f);
             float combinedProgress = Mathf.Max(fakeProgress, realProgress);
 
-            if (loadingUI != null) {
+            if (loadingUI != null)
                 loadingUI.UpdateProgress(combinedProgress);
-            }
-            else if (canvasManager != null) {
+            else if (canvasManager != null)
                 canvasManager.UpdateLoadingProgress(combinedProgress);
-            }
 
             yield return null;
         }
 
-        if (loadingUI != null) {
+        if (loadingUI != null)
             loadingUI.UpdateProgress(1f);
-        }
-        else if (canvasManager != null) {
+        else if (canvasManager != null)
             canvasManager.UpdateLoadingProgress(1f);
-        }
 
-        yield return new WaitForSecondsRealtime(0.5f); // Use realtime to work during pause
+        yield return new WaitForSecondsRealtime(0.5f);
     }
 
     private IEnumerator SetupInteriorScene(string sceneName, string spawnPointID) {
@@ -224,10 +164,8 @@ public class GameSceneManager : MonoBehaviour {
         isInInterior = true;
 
         if (playerController == null) {
-            // First try to find active PlayerController
             playerController = FindObjectOfType<PlayerController>();
 
-            // If not found, look for inactive ones too
             if (playerController == null) {
                 PlayerController[] allPlayers = FindObjectsOfType<PlayerController>(true);
                 foreach (var player in allPlayers) {
@@ -240,10 +178,8 @@ public class GameSceneManager : MonoBehaviour {
         }
 
         if (playerController != null) {
-            // Ensure player's parent (Controllable) is active
-            if (!playerController.transform.parent.gameObject.activeInHierarchy) {
+            if (!playerController.transform.parent.gameObject.activeInHierarchy)
                 playerController.transform.parent.gameObject.SetActive(true);
-            }
 
             InteriorSpawnPoint spawnPoint = FindSpawnPoint(spawnPointID);
             if (spawnPoint != null) {
@@ -254,99 +190,65 @@ public class GameSceneManager : MonoBehaviour {
                 playerController.transform.parent.rotation = spawnRotation;
             }
 
-            // SYNC: Update PlayerController's IsInInterior state
             playerController.SetIsInInterior(true);
 
             playerController.enabled = true;
-
-            // Final validation
-            if (playerController.enabled && playerController.transform.parent.gameObject.activeInHierarchy) {
-                Debug.Log($"[GameSceneManager] Player successfully set up in interior: {sceneName}");
-            }
-            else {
-                Debug.LogError($"[GameSceneManager] Player setup failed! Enabled: {playerController.enabled}, Parent Active: {playerController.transform.parent.gameObject.activeInHierarchy}");
-            }
-        }
-        else {
-            Debug.LogError("[GameSceneManager] PlayerController not found! Make sure player exists and is active.");
         }
     }
 
     private IEnumerator ExitInteriorCoroutine() {
-        // Set exit loading messages before showing loading screen
         if (loadingUI != null) {
             loadingUI.SetLoadingType("interior_exit");
             loadingUI.ShowLoadingScreen();
         }
-        else if (canvasManager != null) {
+        else if (canvasManager != null)
             canvasManager.ShowLoading("interior_exit");
-        }
 
-        if (playerController != null) {
+        if (playerController != null)
             playerController.enabled = false;
-        }
-
-        Debug.Log($"[GameSceneManager] Exiting interior: {currentInteriorScene}");
 
         AsyncOperation unloadOperation = SceneManager.UnloadSceneAsync(currentInteriorScene);
         unloadOperation.allowSceneActivation = false;
 
-        // Use fake loading for exit transition
-        yield return StartCoroutine(FakeLoadingCoroutine(unloadOperation, true)); // true = is exit
+        yield return StartCoroutine(FakeLoadingCoroutine(unloadOperation, true));
 
         unloadOperation.allowSceneActivation = true;
         yield return unloadOperation;
 
-        // First reactivate environment and restore player hierarchy
         if (mainSceneEnvironment != null) {
-            Debug.Log($"[GameSceneManager] Reactivating environment: {mainSceneEnvironment.name}");
             mainSceneEnvironment.SetActive(true);
 
-            // Wait for environment to be fully active and physics to settle
             yield return new WaitForFixedUpdate();
 
-            // Restore player to original parent if it was moved
             if (playerController != null && originalPlayerParent != null) {
-                Transform playerParent = playerController.transform.parent; // Controllable GameObject
-                if (playerParent.parent == null) { // Controllable is at root level
-                    Debug.Log($"[GameSceneManager] Restoring player to original parent in environment");
+                Transform playerParent = playerController.transform.parent;
+                if (playerParent.parent == null) {
                     playerParent.SetParent(originalPlayerParent);
                     originalPlayerParent = null;
                 }
             }
         }
 
-        // Then restore player position and enable
         if (playerController != null) {
-            // Ensure player is at a safe height above ground
             Vector3 safePosition = originalPlayerPosition;
-            safePosition.y += 2f; // Add 2 units above original position as safety margin
+            safePosition.y += 2f;
 
             playerController.transform.parent.position = safePosition;
             playerController.transform.parent.rotation = originalPlayerRotation;
 
-            // SYNC: Update PlayerController's IsInInterior state
             playerController.SetIsInInterior(false);
 
-            // Wait one more frame before enabling player
             yield return null;
             playerController.enabled = true;
-
-            Debug.Log($"[GameSceneManager] Player restored to position: {safePosition}");
         }
 
         isInInterior = false;
-        string exitedScene = currentInteriorScene;
         currentInteriorScene = "";
 
-        if (loadingUI != null) {
+        if (loadingUI != null)
             loadingUI.HideLoadingScreen();
-        }
-        else if (canvasManager != null) {
+        else if (canvasManager != null)
             canvasManager.HideLoading();
-        }
-
-        Debug.Log($"[GameSceneManager] Interior exit completed successfully: {exitedScene}");
     }
 
     private IEnumerator SetupMainScene(string sceneName) {
@@ -356,40 +258,31 @@ public class GameSceneManager : MonoBehaviour {
         isInInterior = false;
         currentInteriorScene = "";
 
-        // SYNC: Update PlayerController's IsInInterior state if available
-        if (playerController == null) {
+
+        if (playerController == null)
             playerController = FindObjectOfType<PlayerController>();
-        }
 
-        if (playerController != null) {
+        if (playerController != null)
             playerController.SetIsInInterior(false);
-        }
 
-        if (mainSceneEnvironment == null) {
+        if (mainSceneEnvironment == null)
             AutoDetectMainEnvironment();
-        }
     }
 
     private InteriorSpawnPoint FindSpawnPoint(string spawnPointID) {
         InteriorSpawnPoint[] allSpawnPoints = FindObjectsOfType<InteriorSpawnPoint>();
 
-        if (allSpawnPoints.Length == 0) {
+        if (allSpawnPoints.Length == 0)
             return null;
-        }
 
-        if (!string.IsNullOrEmpty(spawnPointID)) {
-            foreach (var spawnPoint in allSpawnPoints) {
-                if (spawnPoint.SpawnPointID == spawnPointID) {
+        if (!string.IsNullOrEmpty(spawnPointID))
+            foreach (var spawnPoint in allSpawnPoints)
+                if (spawnPoint.SpawnPointID == spawnPointID)
                     return spawnPoint;
-                }
-            }
-        }
 
-        foreach (var spawnPoint in allSpawnPoints) {
-            if (spawnPoint.PointType == SpawnPointType.Entrance) {
+        foreach (var spawnPoint in allSpawnPoints)
+            if (spawnPoint.PointType == SpawnPointType.Entrance)
                 return spawnPoint;
-            }
-        }
 
         return allSpawnPoints[0];
     }
@@ -405,10 +298,6 @@ public class GameSceneManager : MonoBehaviour {
     }
 
     public void LoadCreditsScene(string creditsSceneName = "Credits") {
-        Debug.Log($"[GameSceneManager] LoadCreditsScene called with scene: {creditsSceneName}");
-        Debug.Log($"[GameSceneManager] Current timeScale: {Time.timeScale}");
-
-        // Load scene first, then clean up after it's loaded
         StartCoroutine(LoadCreditsSceneCoroutine(creditsSceneName));
     }
 
@@ -418,9 +307,8 @@ public class GameSceneManager : MonoBehaviour {
 
     public void AutoDetectMainEnvironment() {
         GameObject envObject = GameObject.FindWithTag("Environment");
-        if (envObject != null) {
+        if (envObject != null)
             mainSceneEnvironment = envObject;
-        }
     }
 
     private bool IsChildOfEnvironment(Transform target, Transform environment) {
@@ -428,105 +316,56 @@ public class GameSceneManager : MonoBehaviour {
 
         Transform current = target;
         while (current != null) {
-            if (current == environment) {
+            if (current == environment)
                 return true;
-            }
+
             current = current.parent;
         }
         return false;
     }
 
     private IEnumerator LoadCreditsSceneCoroutine(string creditsSceneName) {
-        Debug.Log($"[GameSceneManager] Starting LoadCreditsSceneCoroutine for: {creditsSceneName}");
-
-        // Store current timeScale and temporarily restore it for scene loading
-        float originalTimeScale = Time.timeScale;
-        if (Time.timeScale == 0f) {
-            Debug.Log("[GameSceneManager] Time is paused, temporarily restoring timeScale for scene loading");
+        if (Time.timeScale == 0f)
             Time.timeScale = 1f;
-        }
 
-        // Check if scene exists in build settings
-#if UNITY_EDITOR
-        int sceneIndex = SceneUtility.GetBuildIndexByScenePath(creditsSceneName);
-        if (sceneIndex == -1) {
-            Debug.LogError($"[GameSceneManager] Scene '{creditsSceneName}' not found in Build Settings! Please add it to Build Settings.");
-            yield break;
-        }
-#endif
-
-        // Load the credits scene
         yield return StartCoroutine(LoadSceneCoroutine(creditsSceneName, SceneLoadType.Single));
-
-        // Wait a bit to ensure the scene is fully loaded and active
         yield return new WaitForSecondsRealtime(0.5f);
 
-        // Now clean up DontDestroyOnLoad objects after the scene is loaded
-        Debug.Log("[GameSceneManager] Scene loaded successfully, now cleaning up DontDestroyOnLoad objects...");
         CleanupDontDestroyOnLoadObjects();
-
-        // Finally, destroy this GameSceneManager as well
-        Debug.Log("[GameSceneManager] Cleanup complete, destroying GameSceneManager...");
         Destroy(gameObject);
     }
 
     private void CleanupDontDestroyOnLoadObjects() {
-        Debug.Log("[GameSceneManager] Cleaning up DontDestroyOnLoad objects...");
-
-        // Find all root objects in the DontDestroyOnLoad scene
         GameObject[] dontDestroyObjects = FindObjectsOfType<GameObject>();
-        int destroyedCount = 0;
 
-        foreach (GameObject obj in dontDestroyObjects) {
-            // Only consider root objects (no parent)
-            if (obj.transform.parent == null && obj.scene.name == "DontDestroyOnLoad") {
-                // Skip essential Unity objects (like the event system)
-                if (ShouldDestroyDontDestroyOnLoadObject(obj)) {
-                    Debug.Log($"[GameSceneManager] Destroying DontDestroyOnLoad object: {obj.name}");
+        foreach (GameObject obj in dontDestroyObjects)
+            if (obj.transform.parent == null && obj.scene.name == "DontDestroyOnLoad")
+                if (ShouldDestroyDontDestroyOnLoadObject(obj))
                     Destroy(obj);
-                    destroyedCount++;
-                }
-            }
-        }
-
-        Debug.Log($"[GameSceneManager] Cleaned up {destroyedCount} DontDestroyOnLoad objects");
     }
 
     private bool ShouldDestroyDontDestroyOnLoadObject(GameObject obj) {
-        // List of objects we want to keep (essential Unity systems)
         string[] keepObjects = {
             "EventSystem",
-            "Main Camera", // In case there's a main camera marked as DontDestroyOnLoad
+            "Main Camera"
         };
 
-        // List of game objects we specifically want to destroy
         string[] destroyObjects = {
             "GameController",
             "InteriorSceneManager",
             "CanvasManager",
             "KeyInventoryManager",
             "AudioManager"
-            // Note: GameSceneManager will destroy itself after cleanup
         };
 
-        // Don't destroy essential Unity objects
-        foreach (string keepName in keepObjects) {
-            if (obj.name.Contains(keepName)) {
-                Debug.Log($"[GameSceneManager] Keeping essential object: {obj.name}");
+        foreach (string keepName in keepObjects)
+            if (obj.name.Contains(keepName))
                 return false;
-            }
-        }
 
-        // Specifically destroy our game managers
-        foreach (string destroyName in destroyObjects) {
-            if (obj.name.Contains(destroyName)) {
-                Debug.Log($"[GameSceneManager] Will destroy game manager: {obj.name}");
+        foreach (string destroyName in destroyObjects)
+            if (obj.name.Contains(destroyName))
                 return true;
-            }
-        }
 
-        // For any other objects, log them but destroy them (safer approach)
-        Debug.Log($"[GameSceneManager] Unknown DontDestroyOnLoad object, will destroy: {obj.name}");
         return true;
     }
 }

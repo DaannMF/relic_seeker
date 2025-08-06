@@ -61,9 +61,8 @@ public class AudioManager : MonoBehaviour {
         activeAudioSources = new List<AudioSource>();
         namedAudioSources = new Dictionary<string, AudioSource>();
 
-        for (int i = 0; i < poolSize; i++) {
+        for (int i = 0; i < poolSize; i++)
             CreateAudioSource();
-        }
     }
 
     private AudioSource CreateAudioSource() {
@@ -110,12 +109,10 @@ public class AudioManager : MonoBehaviour {
     }
 
     private AudioSource GetAudioSource() {
-        if (audioSourcePool.Count > 0) {
+        if (audioSourcePool.Count > 0)
             return audioSourcePool.Dequeue();
-        }
-        else {
+        else
             return CreateAudioSource();
-        }
     }
 
     private void ReturnAudioSource(AudioSource audioSource) {
@@ -126,9 +123,8 @@ public class AudioManager : MonoBehaviour {
             audioSource.spatialBlend = 0f;
             audioSource.transform.position = transform.position;
 
-            if (activeAudioSources.Contains(audioSource)) {
+            if (activeAudioSources.Contains(audioSource))
                 activeAudioSources.Remove(audioSource);
-            }
 
             audioSourcePool.Enqueue(audioSource);
         }
@@ -136,30 +132,26 @@ public class AudioManager : MonoBehaviour {
 
     private void PlayAudio(string clipName, AudioType audioType) {
         AudioClipData clipData = audioClipCollection.GetAudioClip(clipName);
-        if (clipData?.clip != null) {
+        if (clipData?.clip != null)
             PlayAudioInternal(clipData, audioType, Vector3.zero, false, false);
-        }
     }
 
     private void PlayAudio3D(string clipName, AudioType audioType, Vector3 position) {
         AudioClipData clipData = audioClipCollection.GetAudioClip(clipName);
-        if (clipData?.clip != null) {
+        if (clipData?.clip != null)
             PlayAudioInternal(clipData, audioType, position, true, false);
-        }
     }
 
     private void PlayAudioLoop(string clipName, AudioType audioType, bool loop) {
         AudioClipData clipData = audioClipCollection.GetAudioClip(clipName);
-        if (clipData?.clip != null) {
+        if (clipData?.clip != null)
             PlayAudioInternal(clipData, audioType, Vector3.zero, false, loop);
-        }
     }
 
     private void PlayAudio3DLoop(string clipName, AudioType audioType, Vector3 position, bool loop) {
         AudioClipData clipData = audioClipCollection.GetAudioClip(clipName);
-        if (clipData?.clip != null) {
+        if (clipData?.clip != null)
             PlayAudioInternal(clipData, audioType, position, true, loop);
-        }
     }
 
     private void PlayAudioInternal(AudioClipData clipData, AudioType audioType, Vector3 position, bool is3D, bool forceLoop) {
@@ -173,18 +165,16 @@ public class AudioManager : MonoBehaviour {
             audioSource.spatialBlend = 1f;
             audioSource.transform.position = position;
         }
-        else {
+        else
             audioSource.spatialBlend = 0f;
-        }
 
         activeAudioSources.Add(audioSource);
         namedAudioSources[clipData.clipName] = audioSource;
 
         audioSource.Play();
 
-        if (!audioSource.loop) {
+        if (!audioSource.loop)
             StartCoroutine(ReturnAudioSourceAfterClip(audioSource, clipData.clip.length));
-        }
     }
 
     private IEnumerator ReturnAudioSourceAfterClip(AudioSource audioSource, float clipLength) {
@@ -198,9 +188,8 @@ public class AudioManager : MonoBehaviour {
                     break;
                 }
             }
-            if (keyToRemove != null) {
+            if (keyToRemove != null)
                 namedAudioSources.Remove(keyToRemove);
-            }
         }
 
         ReturnAudioSource(audioSource);
@@ -228,9 +217,9 @@ public class AudioManager : MonoBehaviour {
     }
 
     private void StopAllAudio() {
-        foreach (var audioSource in activeAudioSources.ToArray()) {
+        foreach (var audioSource in activeAudioSources.ToArray())
             ReturnAudioSource(audioSource);
-        }
+
         namedAudioSources.Clear();
     }
 
@@ -262,9 +251,8 @@ public class AudioManager : MonoBehaviour {
         foreach (var audioSource in activeAudioSources) {
             if (audioSource.clip != null) {
                 AudioClipData clipData = audioClipCollection.GetAudioClip(audioSource.clip.name);
-                if (clipData != null) {
+                if (clipData != null)
                     audioSource.volume = GetVolumeMultiplier(clipData.audioType) * masterVolume;
-                }
             }
         }
     }
@@ -273,23 +261,20 @@ public class AudioManager : MonoBehaviour {
         foreach (var audioSource in activeAudioSources) {
             if (audioSource.clip != null) {
                 AudioClipData clipData = audioClipCollection.GetAudioClip(audioSource.clip.name);
-                if (clipData != null && clipData.audioType == audioType) {
+                if (clipData != null && clipData.audioType == audioType)
                     audioSource.volume = GetVolumeMultiplier(audioType) * masterVolume;
-                }
             }
         }
     }
 
     private void SetAudioVolume(string clipName, float volume) {
-        if (namedAudioSources.ContainsKey(clipName)) {
+        if (namedAudioSources.ContainsKey(clipName))
             namedAudioSources[clipName].volume = volume * masterVolume;
-        }
     }
 
     private void FadeAudio(string clipName, float targetVolume) {
-        if (namedAudioSources.ContainsKey(clipName)) {
+        if (namedAudioSources.ContainsKey(clipName))
             StartCoroutine(FadeAudioCoroutine(namedAudioSources[clipName], targetVolume, 1f));
-        }
     }
 
     private IEnumerator FadeAudioCoroutine(AudioSource audioSource, float targetVolume, float fadeTime) {

@@ -11,19 +11,12 @@ public class LoadingUISetup : MonoBehaviour {
     }
 
     private void CreateLoadingUI() {
-        if (targetCanvas == null) {
+        if (targetCanvas == null)
             targetCanvas = FindObjectOfType<Canvas>();
-        }
 
-        if (targetCanvas == null) {
-            Debug.LogError("[LoadingUISetup] No Canvas found! Please assign a Canvas or create one first.");
-            return;
-        }
+        if (targetCanvas == null) return;
 
-        if (FindObjectOfType<LoadingUI>() != null) {
-            Debug.Log("[LoadingUISetup] LoadingUI already exists, skipping creation");
-            return;
-        }
+        if (FindObjectOfType<LoadingUI>() != null) return;
 
         GameObject loadingPanel = new GameObject("LoadingPanel");
         loadingPanel.transform.SetParent(targetCanvas.transform, false);
@@ -37,7 +30,6 @@ public class LoadingUISetup : MonoBehaviour {
         Image backgroundImage = loadingPanel.AddComponent<Image>();
         backgroundImage.color = new Color(0, 0, 0, 1f);
 
-        // Create Game Title
         GameObject titleText = new GameObject("TitleText");
         titleText.transform.SetParent(loadingPanel.transform, false);
 
@@ -141,12 +133,10 @@ public class LoadingUISetup : MonoBehaviour {
 
         loadingPanel.SetActive(false);
 
-        if (CanvasManager.Instance != null) {
+        if (CanvasManager.Instance != null)
             CanvasManager.Instance.SetLoadingUI(loadingUI);
-        }
 
-        if (GameSceneManager.Instance != null) {
+        if (GameSceneManager.Instance != null)
             GameSceneManager.Instance.SetLoadingUI(loadingUI);
-        }
     }
 }

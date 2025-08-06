@@ -18,6 +18,20 @@ public class SettingsPanel : MonoBehaviour {
         SetupSliderEvents();
     }
 
+    private void OnDestroy() {
+        if (masterVolumeSlider != null)
+            masterVolumeSlider.onValueChanged.RemoveListener(OnMasterVolumeChanged);
+
+        if (musicVolumeSlider != null)
+            musicVolumeSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);
+
+        if (uiVolumeSlider != null)
+            uiVolumeSlider.onValueChanged.RemoveListener(OnUIVolumeChanged);
+
+        if (sfxVolumeSlider != null)
+            sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
+    }
+
     private void InitializeSliders() {
         if (masterVolumeSlider != null)
             masterVolumeSlider.value = PlayerPrefs.GetFloat(MASTER_VOLUME_KEY, 1f);
@@ -60,19 +74,5 @@ public class SettingsPanel : MonoBehaviour {
 
     private void OnSFXVolumeChanged(float value) {
         AudioEvents.OnSetSFXVolume?.Invoke(value);
-    }
-
-    private void OnDestroy() {
-        if (masterVolumeSlider != null)
-            masterVolumeSlider.onValueChanged.RemoveListener(OnMasterVolumeChanged);
-
-        if (musicVolumeSlider != null)
-            musicVolumeSlider.onValueChanged.RemoveListener(OnMusicVolumeChanged);
-
-        if (uiVolumeSlider != null)
-            uiVolumeSlider.onValueChanged.RemoveListener(OnUIVolumeChanged);
-
-        if (sfxVolumeSlider != null)
-            sfxVolumeSlider.onValueChanged.RemoveListener(OnSFXVolumeChanged);
     }
 }

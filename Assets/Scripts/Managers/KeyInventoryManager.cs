@@ -85,7 +85,7 @@ public class KeyInventoryManager : MonoBehaviour {
 
     private void CheckHasKeys(int requiredKeys, System.Action<bool> callback) {
         bool hasEnough = currentKeys >= requiredKeys;
-        Debug.Log($"[KeyInventoryManager] CheckHasKeys: need {requiredKeys}, have {currentKeys}, result: {hasEnough}");
+
         callback?.Invoke(hasEnough);
     }
 }

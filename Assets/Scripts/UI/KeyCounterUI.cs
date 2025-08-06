@@ -15,42 +15,26 @@ public class KeyCounterUI : MonoBehaviour {
     private int currentKeyCount = 0;
 
     private void Start() {
-        // Subscribe to key count changes
         InventoryEvents.OnKeyCountChanged += OnKeyCountChanged;
 
-        // Get initial key count
         InventoryEvents.OnGetKeyCount?.Invoke(OnInitialKeyCountReceived);
 
-        // Auto-detect UI elements if not assigned
         AutoDetectUIElements();
     }
 
     private void OnDestroy() {
-        // Unsubscribe from events
         InventoryEvents.OnKeyCountChanged -= OnKeyCountChanged;
     }
 
     private void AutoDetectUIElements() {
-        // Auto-detect text component if not assigned
-        if (keyCountText == null) {
+        if (keyCountText == null)
             keyCountText = GetComponentInChildren<TextMeshProUGUI>();
-            if (keyCountText == null) {
-                Text legacyText = GetComponentInChildren<Text>();
-                if (legacyText != null) {
-                    Debug.LogWarning("[KeyCounterUI] Using legacy Text component. Consider upgrading to TextMeshPro.");
-                }
-            }
-        }
 
-        // Auto-detect image component if not assigned
-        if (keyIcon == null) {
+        if (keyIcon == null)
             keyIcon = GetComponentInChildren<Image>();
-        }
 
-        // Use this GameObject as panel if not assigned
-        if (keyCounterPanel == null) {
+        if (keyCounterPanel == null)
             keyCounterPanel = gameObject;
-        }
     }
 
     private void OnInitialKeyCountReceived(int keyCount) {
@@ -64,16 +48,13 @@ public class KeyCounterUI : MonoBehaviour {
     }
 
     private void UpdateDisplay() {
-        // Update text
         if (keyCountText != null) {
             string newText = string.Format(keyCountFormat, currentKeyCount);
             keyCountText.text = newText;
         }
 
-        // Handle visibility
-        if (hideWhenZeroKeys && keyCounterPanel != null) {
+        if (hideWhenZeroKeys && keyCounterPanel != null)
             keyCounterPanel.SetActive(currentKeyCount > 0);
-        }
     }
 
     public void SetKeyCountFormat(string format) {

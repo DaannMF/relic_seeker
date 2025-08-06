@@ -7,20 +7,16 @@ public class PlayerInput : MonoBehaviour {
     public bool IsMoving => MovementInput.magnitude > 0.1f;
     public bool InteractPressed { get; private set; }
 
-    // Jump input properties
     public bool JumpPressed { get; private set; }
     public bool JumpHeld { get; private set; }
     public bool JumpReleased { get; private set; }
 
-    // Run input properties
     public bool RunPressed { get; private set; }
     public bool RunHeld { get; private set; }
     public bool RunReleased { get; private set; }
 
-    // Return to original player
     public bool ReturnToPlayerPressed { get; private set; }
 
-    // Pause/Menu input
     public bool PausePressed { get; private set; }
 
     private void Update() {
@@ -49,9 +45,7 @@ public class PlayerInput : MonoBehaviour {
         // Get pause input (Esc key)
         PausePressed = Input.GetKeyDown(KeyCode.Escape);
 
-        // Handle pause toggle (always available in game, scene-based check)
         if (PausePressed) {
-            // Only allow pause if we're not in MainMenu scene
             string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
             if (!currentScene.Contains("MainMenu")) {
                 GameEvents.OnTogglePauseRequested?.Invoke();

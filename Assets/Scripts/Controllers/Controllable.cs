@@ -30,7 +30,6 @@ public class Controllable : MonoBehaviour, IControllable {
             }
         }
 
-        // Auto-asignar OutlineController si no está asignado
         if (outlineController == null) {
             outlineController = GetComponentInChildren<OutlineController>();
         }
@@ -53,7 +52,6 @@ public class Controllable : MonoBehaviour, IControllable {
             isShowingPrompt = true;
         }
 
-        // Also call outline for visual feedback
         OutlineEntity();
     }
 
@@ -63,20 +61,16 @@ public class Controllable : MonoBehaviour, IControllable {
             isShowingPrompt = false;
         }
 
-        // Ocultar outline cuando se deja de mirar
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.HideOutline();
-        }
     }
 
     public void OnInteract(PlayerController controller) {
-        // Hide prompt when interacting
         if (isShowingPrompt) {
             UIEvents.OnPromptHide?.Invoke();
             isShowingPrompt = false;
         }
 
-        // Control the entity
         ControlEntity(controller);
     }
 
@@ -111,9 +105,8 @@ public class Controllable : MonoBehaviour, IControllable {
     }
 
     public void OutlineEntity() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.ShowOutline();
-        }
     }
 
     public bool IsOriginalPlayer() {

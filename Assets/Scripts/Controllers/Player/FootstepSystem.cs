@@ -32,7 +32,6 @@ public class FootstepSystem : MonoBehaviour {
             return;
         }
 
-        // Don't play footsteps if not controlling the original player
         if (!IsOriginalPlayer()) {
             footstepTimer = 0f;
             return;

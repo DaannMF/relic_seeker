@@ -25,15 +25,13 @@ public class WalkState : BaseState<EPlayerStates> {
     }
 
     public override EPlayerStates GetNextState() {
-        if (Context.Input.JumpPressed) {
+        if (Context.Input.JumpPressed)
             return EPlayerStates.Jump;
-        }
 
         if (Context.Input.IsMoving) {
 
             if (Context.Input.RunHeld)
                 return EPlayerStates.Run;
-
 
             return EPlayerStates.Walk;
         }

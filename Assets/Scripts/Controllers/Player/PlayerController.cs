@@ -70,24 +70,19 @@ public class PlayerController : MonoBehaviour {
             if (hit.collider.transform.parent.TryGetComponent(out Controllable controllable)) {
                 detectedControllable = controllable;
 
-                // If this is a new controllable, show prompt
                 if (currentDetectedControllable != detectedControllable) {
-                    if (currentDetectedControllable != null) {
+                    if (currentDetectedControllable != null)
                         currentDetectedControllable.OnStopLooking();
-                    }
 
                     currentDetectedControllable = detectedControllable;
                     controllable.OnStartLooking();
                 }
 
-                // Handle interaction
-                if (input.InteractPressed) {
+                if (input.InteractPressed)
                     controllable.OnInteract(this);
-                }
             }
         }
 
-        // If no controllable detected but we had one before, hide prompt
         if (detectedControllable == null && currentDetectedControllable != null) {
             currentDetectedControllable.OnStopLooking();
             currentDetectedControllable = null;
@@ -95,9 +90,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void HandleReturnToPlayer() {
-        if (input.ReturnToPlayerPressed) {
+        if (input.ReturnToPlayerPressed)
             Controllable.ReturnToOriginalPlayer(this);
-        }
     }
 
     public Vector3 GetCameraForward() {
@@ -115,18 +109,15 @@ public class PlayerController : MonoBehaviour {
     public void RefreshReferences() {
         rb = transform.parent.GetComponent<Rigidbody>();
 
-        // Reset rotation variables with new entity's rotation
         if (rb != null) {
             rotationY = rb.transform.eulerAngles.y;
             rotationX = cameraTransform.localEulerAngles.x;
 
-            // Handle case where rotationX might be > 180 (Unity's angle representation)
             if (rotationX > 180f) {
                 rotationX -= 360f;
             }
         }
 
-        // Clear any detected controllable when switching entities
         if (currentDetectedControllable != null) {
             currentDetectedControllable.OnStopLooking();
             currentDetectedControllable = null;
@@ -142,7 +133,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void OnDisable() {
-        // Clear any detected controllable when player is disabled
         if (currentDetectedControllable != null) {
             currentDetectedControllable.OnStopLooking();
             currentDetectedControllable = null;

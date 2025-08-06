@@ -35,16 +35,13 @@ public class DogWalkState : BaseState<EDogStates> {
     }
 
     public override EDogStates GetNextState() {
-        // Priority: If player is detected, bark immediately
-        if (Context.CanSeePlayer()) {
+        if (Context.CanSeePlayer())
             return EDogStates.Bark;
-        }
 
         float walkTime = StateData.WalkTime;
 
-        if (!Context.HasTarget || Context.StateTimer >= walkTime) {
+        if (!Context.HasTarget || Context.StateTimer >= walkTime)
             return EDogStates.Idle;
-        }
 
         return EDogStates.Walk;
     }

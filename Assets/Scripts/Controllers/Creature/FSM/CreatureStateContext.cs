@@ -36,9 +36,8 @@ public class CreatureStateContext : BaseStateContext<ECreatureStates> {
 
             Vector3 potentialPosition = creatureController.StartPosition + randomDirection3D;
 
-            if (creatureController.IsWithinRadius(potentialPosition) && IsValidWalkPosition(potentialPosition)) {
+            if (creatureController.IsWithinRadius(potentialPosition) && IsValidWalkPosition(potentialPosition))
                 return potentialPosition;
-            }
         }
 
         // If no valid position found, return a position slightly away from current position

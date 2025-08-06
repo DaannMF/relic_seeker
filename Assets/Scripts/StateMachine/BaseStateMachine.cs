@@ -30,6 +30,7 @@ public abstract class BaseStateMachine<EState> : MonoBehaviour where EState : En
     void FixedUpdate() {
         _currentState.FixedUpdate();
     }
+
     void TransitionToState(EState nextState) {
         _isTransitioning = true;
         _currentState.Exit();

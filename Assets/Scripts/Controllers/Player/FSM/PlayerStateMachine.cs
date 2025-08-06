@@ -35,7 +35,6 @@ public class PlayerStateMachine : BaseStateMachine<EPlayerStates> {
         _currentState = _states[EPlayerStates.Idle];
     }
 
-    // Method to refresh Animator reference when controlling different entities
     public void RefreshAnimatorReference() {
         _animator = transform.parent.GetComponentInChildren<Animator>();
         if (_context != null) {

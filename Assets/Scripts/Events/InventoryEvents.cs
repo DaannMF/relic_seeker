@@ -1,8 +1,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public static class InventoryEvents
-{
+public static class InventoryEvents {
     [Header("Key Management")]
     public static UnityAction<int> OnAddKeys;
     public static UnityAction<int> OnRemoveKeys;

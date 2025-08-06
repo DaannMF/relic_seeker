@@ -19,7 +19,6 @@ public class GameController : MonoBehaviour {
     }
 
     private void EnsureRequiredManagers() {
-        // Ensure KeyInventoryManager exists
         if (KeyInventoryManager.Instance == null) {
             GameObject keyManagerObj = new GameObject("KeyInventoryManager");
             keyManagerObj.AddComponent<KeyInventoryManager>();
@@ -27,15 +26,12 @@ public class GameController : MonoBehaviour {
     }
 
     private void CheckForMainMenuReset() {
-        // Reset keys when returning to MainMenu scene
         string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-        if (currentScene.Contains("MainMenu")) {
+        if (currentScene.Contains("MainMenu"))
             ResetGameProgress();
-        }
     }
 
     private void ResetGameProgress() {
-        // Reset keys to 0 for new game session
         InventoryEvents.OnSetKeys?.Invoke(0);
     }
 
@@ -62,24 +58,20 @@ public class GameController : MonoBehaviour {
     }
 
     private void HandlePauseRequested() {
-        if (currentState == GameState.Playing) {
+        if (currentState == GameState.Playing)
             SetGameState(GameState.Paused);
-        }
     }
 
     private void HandleResumeRequested() {
-        if (currentState == GameState.Paused) {
+        if (currentState == GameState.Paused)
             SetGameState(GameState.Playing);
-        }
     }
 
     private void HandleTogglePauseRequested() {
-        if (currentState == GameState.Playing) {
+        if (currentState == GameState.Playing)
             SetGameState(GameState.Paused);
-        }
-        else if (currentState == GameState.Paused) {
+        else if (currentState == GameState.Paused)
             SetGameState(GameState.Playing);
-        }
     }
 
     private void HandleStartGameRequested() {
@@ -92,22 +84,13 @@ public class GameController : MonoBehaviour {
     }
 
     private void HandleGameWonTriggered() {
-        Debug.Log("[GameController] Game won triggered! Setting state to Won and loading credits...");
         SetGameState(GameState.Won);
-
-        // Load credits immediately instead of using Invoke
-        Debug.Log("[GameController] About to call LoadCredits directly...");
         LoadCredits();
     }
 
     private void LoadCredits() {
-        Debug.Log("[GameController] Loading credits scene...");
-        if (GameSceneManager.Instance != null) {
+        if (GameSceneManager.Instance != null)
             GameSceneManager.Instance.LoadCreditsScene("Credits");
-        }
-        else {
-            Debug.LogError("[GameController] GameSceneManager.Instance is null! Cannot load credits.");
-        }
     }
 
     private void HandleGameLostTriggered() {
@@ -128,7 +111,7 @@ public class GameController : MonoBehaviour {
 
         switch (newState) {
             case GameState.Paused:
-                Time.timeScale = 0f; // Pause the game
+                Time.timeScale = 0f;
                 GameEvents.OnGamePaused?.Invoke();
                 break;
             case GameState.Playing:
@@ -138,16 +121,15 @@ public class GameController : MonoBehaviour {
                 }
                 break;
             case GameState.Won:
-                Debug.Log("[GameController] Setting state to Won, pausing time and invoking OnGameWon");
-                Time.timeScale = 0f; // Pause on game over
+                Time.timeScale = 0f;
                 GameEvents.OnGameWon?.Invoke();
                 break;
             case GameState.Lost:
-                Time.timeScale = 0f; // Pause on game over
+                Time.timeScale = 0f;
                 GameEvents.OnGameLost?.Invoke();
                 break;
             case GameState.MainMenu:
-                Time.timeScale = 1f; // Ensure normal time in menu
+                Time.timeScale = 1f;
                 GameEvents.OnReturnToMainMenu?.Invoke();
                 break;
         }

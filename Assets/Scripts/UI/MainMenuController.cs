@@ -43,27 +43,22 @@ public class MainMenuController : MonoBehaviour {
     }
 
     private void SetupUI() {
-        if (playButtonText == null && playButton != null) {
+        if (playButtonText == null && playButton != null)
             playButtonText = playButton.GetComponentInChildren<TextMeshProUGUI>();
-        }
 
 #if UNITY_WEBGL
-        if (quitButton != null) {
+        if (quitButton != null) 
             quitButton.gameObject.SetActive(false);
-        }
 #endif
 
-        if (playButton != null) {
+        if (playButton != null)
             playButton.onClick.AddListener(OnPlayButtonClicked);
-        }
 
-        if (quitButton != null) {
+        if (quitButton != null)
             quitButton.onClick.AddListener(OnQuitButtonClicked);
-        }
 
-        if (returnToMenuButton != null) {
+        if (returnToMenuButton != null)
             returnToMenuButton.onClick.AddListener(OnReturnToMenuButtonClicked);
-        }
     }
 
     private void UpdateUI() {
@@ -73,7 +68,6 @@ public class MainMenuController : MonoBehaviour {
         if (playButtonText != null) {
             if (isInMainMenu)
                 playButtonText.text = playText;
-
             else if (currentGameState == GameState.Paused)
                 playButtonText.text = resumeText;
         }
@@ -81,26 +75,22 @@ public class MainMenuController : MonoBehaviour {
         if (returnToMenuButton != null)
             returnToMenuButton.gameObject.SetActive(isInGame);
 
-
         if (quitButton != null)
             quitButton.gameObject.SetActive(!isInGame);
     }
 
     public void OnPlayButtonClicked() {
         if (currentGameState == GameState.MainMenu) {
-            if (GameSceneManager.Instance != null) {
+            if (GameSceneManager.Instance != null)
                 GameSceneManager.Instance.LoadMainGameScene(mainGameSceneName);
-            }
         }
-        else if (currentGameState == GameState.Paused) {
+        else if (currentGameState == GameState.Paused)
             GameEvents.OnResumeRequested?.Invoke();
-        }
     }
 
     public void OnReturnToMenuButtonClicked() {
-        if (GameSceneManager.Instance != null) {
+        if (GameSceneManager.Instance != null)
             GameSceneManager.Instance.ReturnToMainMenu(mainMenuSceneName);
-        }
     }
 
     public void OnQuitButtonClicked() {

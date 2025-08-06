@@ -12,19 +12,16 @@ public class OutlineController : MonoBehaviour {
     private bool isOutlined = false;
 
     private void Awake() {
-        if (autoFindRenderers) {
+        if (autoFindRenderers)
             FindRenderers();
-        }
+    }
+
+    private void OnDestroy() {
+        HideOutline();
     }
 
     private void FindRenderers() {
-        // Buscar todos los renderers en el GameObject y sus hijos
         renderers = GetComponentsInChildren<Renderer>();
-        StoreOriginalMaterials();
-    }
-
-    public void SetRenderers(Renderer[] customRenderers) {
-        renderers = customRenderers;
         StoreOriginalMaterials();
     }
 
@@ -45,19 +42,15 @@ public class OutlineController : MonoBehaviour {
         for (int i = 0; i < renderers.Length; i++) {
             if (renderers[i] != null && originalMaterials[i] != null) {
                 if (replaceBaseMaterial) {
-                    // Reemplazar el material base con el outline
                     Material[] materialsWithOutline = new Material[originalMaterials[i].Length];
                     System.Array.Copy(originalMaterials[i], materialsWithOutline, originalMaterials[i].Length);
 
-                    // Reemplazar el material en el índice especificado
-                    if (baseMaterialIndex < materialsWithOutline.Length) {
+                    if (baseMaterialIndex < materialsWithOutline.Length)
                         materialsWithOutline[baseMaterialIndex] = outlineMaterial;
-                    }
 
                     renderers[i].materials = materialsWithOutline;
                 }
                 else {
-                    // Agregar outline como material adicional (comportamiento original)
                     Material[] materialsWithOutline = new Material[originalMaterials[i].Length + 1];
                     System.Array.Copy(originalMaterials[i], materialsWithOutline, originalMaterials[i].Length);
                     materialsWithOutline[materialsWithOutline.Length - 1] = outlineMaterial;
@@ -79,27 +72,5 @@ public class OutlineController : MonoBehaviour {
         }
 
         isOutlined = false;
-    }
-
-    public void ToggleOutline() {
-        if (isOutlined) {
-            HideOutline();
-        }
-        else {
-            ShowOutline();
-        }
-    }
-
-    public bool IsOutlined => isOutlined;
-
-    private void OnDestroy() {
-        HideOutline();
-    }
-
-    // Método para refrescar los renderers si la jerarquía cambia
-    public void RefreshRenderers() {
-        if (autoFindRenderers) {
-            FindRenderers();
-        }
     }
 }

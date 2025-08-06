@@ -42,9 +42,8 @@ public class DogStateContext : BaseStateContext<EDogStates> {
 
             Vector3 potentialPosition = dogController.StartPosition + randomDirection3D;
 
-            if (dogController.IsWithinRadius(potentialPosition) && IsValidWalkPosition(potentialPosition)) {
+            if (dogController.IsWithinRadius(potentialPosition) && IsValidWalkPosition(potentialPosition))
                 return potentialPosition;
-            }
         }
 
         Vector3 fallbackDirection = Random.insideUnitCircle.normalized * 2f;

@@ -44,7 +44,7 @@ public class LoadingUI : MonoBehaviour {
         bool includeInactive = true;
         if (loadingPanel == null) loadingPanel = FindObjectOfType<LoadingUI>(includeInactive).gameObject;
         if (loadingPanel != null) loadingPanel.SetActive(false);
-        else Debug.LogError("LoadingUI not found");
+
     }
 
     private void OnEnable() {
@@ -58,32 +58,24 @@ public class LoadingUI : MonoBehaviour {
     }
 
     public void ShowLoadingScreen() {
-        if (loadingPanel != null) {
+        if (loadingPanel != null)
             loadingPanel.SetActive(true);
-        }
 
-        // Set default messages if none are set
-        if (currentMessages == null) {
+        if (currentMessages == null)
             currentMessages = defaultLoadingMessages;
-        }
 
-        // Reset progress
         UpdateProgress(0f);
 
-        // Start cycling through loading messages
-        if (loadingMessageCoroutine != null) {
+        if (loadingMessageCoroutine != null)
             StopCoroutine(loadingMessageCoroutine);
-        }
 
         loadingMessageCoroutine = StartCoroutine(CycleLoadingMessages());
     }
 
     public void HideLoadingScreen() {
-        if (loadingPanel != null) {
+        if (loadingPanel != null)
             loadingPanel.SetActive(false);
-        }
 
-        // Stop loading message cycling
         if (loadingMessageCoroutine != null) {
             StopCoroutine(loadingMessageCoroutine);
             loadingMessageCoroutine = null;
@@ -91,18 +83,13 @@ public class LoadingUI : MonoBehaviour {
     }
 
     public void UpdateProgress(float progress) {
-        // Clamp progress between 0 and 1
         progress = Mathf.Clamp01(progress);
 
-        // Update progress bar
-        if (progressBar != null) {
+        if (progressBar != null)
             progressBar.value = progress;
-        }
 
-        // Update progress text
-        if (progressText != null) {
+        if (progressText != null)
             progressText.text = $"{Mathf.RoundToInt(progress * 100)}%";
-        }
     }
 
     private IEnumerator CycleLoadingMessages() {
@@ -118,25 +105,11 @@ public class LoadingUI : MonoBehaviour {
         }
     }
 
-    public void SetLoadingMessage(string message) {
-        if (loadingText != null) {
-            loadingText.text = message;
-        }
-    }
-
     public void SetLoadingType(string loadingType) {
-        switch (loadingType.ToLower()) {
-            case "interior_entry":
-                currentMessages = interiorEntryMessages;
-                break;
-            case "interior_exit":
-                currentMessages = interiorExitMessages;
-                break;
-            case "single":
-            case "default":
-            default:
-                currentMessages = defaultLoadingMessages;
-                break;
-        }
+        currentMessages = loadingType.ToLower() switch {
+            "interior_entry" => interiorEntryMessages,
+            "interior_exit" => interiorExitMessages,
+            _ => defaultLoadingMessages,
+        };
     }
 }

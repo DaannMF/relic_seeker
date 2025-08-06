@@ -6,7 +6,6 @@ public class WalkSO : BaseStateDO<EPlayerStates> {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float maxAngleMovement = 30f;
 
-    // Properties to access the settings
     public float MoveSpeed => moveSpeed;
     public float MaxAngleMovement => maxAngleMovement;
 

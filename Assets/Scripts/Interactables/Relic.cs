@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
@@ -26,62 +27,45 @@ public class Relic : MonoBehaviour {
     private float lightTimer = 0f;
 
     private void Start() {
-        // Ensure the collider is set as trigger
         Collider col = GetComponent<Collider>();
-        if (col != null) {
+        if (col != null)
             col.isTrigger = true;
-        }
 
-        // If no visual representation assigned, try to find one
         if (visualRepresentation == null) {
             Transform visual = transform.Find("Visual");
-            if (visual != null) {
+            if (visual != null)
                 visualRepresentation = visual.gameObject;
-            }
-            else if (transform.childCount > 0) {
+            else if (transform.childCount > 0)
                 visualRepresentation = transform.GetChild(0).gameObject;
-            }
         }
 
-        // Auto-assign OutlineController if not assigned
-        if (outlineController == null) {
+        if (outlineController == null)
             outlineController = GetComponentInChildren<OutlineController>();
-        }
 
-        // Auto-assign components if not assigned
-        if (collectEffect == null) {
+        if (collectEffect == null)
             collectEffect = GetComponentInChildren<ParticleSystem>();
-        }
 
-        if (relicLight == null) {
+        if (relicLight == null)
             relicLight = GetComponentInChildren<Light>();
-        }
 
-        // Start playing ambient sound if specified
-        if (!string.IsNullOrEmpty(ambientAudioClip)) {
+        if (!string.IsNullOrEmpty(ambientAudioClip))
             AudioEvents.OnPlayAudioLoop?.Invoke(ambientAudioClip, AudioType.SFX, true);
-        }
     }
 
     private void OnDestroy() {
-        // Stop ambient sound if still playing
-        if (!string.IsNullOrEmpty(ambientAudioClip)) {
+        if (!string.IsNullOrEmpty(ambientAudioClip))
             AudioEvents.OnStopAudio?.Invoke(ambientAudioClip);
-        }
     }
 
     private void Update() {
         if (isCollected) return;
 
-        // Handle light pulsing effect
         HandleLightPulse();
 
-        // Handle player interaction
         if (!autoCollect && playerInRange && currentPlayer != null) {
             PlayerInput input = currentPlayer.GetComponent<PlayerInput>();
-            if (input != null && input.InteractPressed) {
+            if (input != null && input.InteractPressed)
                 CollectRelic();
-            }
         }
     }
 
@@ -99,22 +83,17 @@ public class Relic : MonoBehaviour {
 
         PlayerController player = other.transform.parent.GetComponentInChildren<PlayerController>();
         if (player != null) {
-            // Only allow original player to collect the relic
-            if (!IsOriginalPlayer(player)) {
+            if (!IsOriginalPlayer(player))
                 return;
-            }
 
             playerInRange = true;
             currentPlayer = player;
 
-            if (autoCollect) {
+            if (autoCollect)
                 CollectRelic();
-            }
-            else {
+            else
                 UIEvents.OnPromptShow?.Invoke("Press E to collect the Sacred Relic");
-            }
 
-            // Show outline when player enters range
             ShowOutline();
         }
     }
@@ -125,11 +104,9 @@ public class Relic : MonoBehaviour {
             playerInRange = false;
             currentPlayer = null;
 
-            if (!autoCollect) {
+            if (!autoCollect)
                 UIEvents.OnPromptHide?.Invoke();
-            }
 
-            // Hide outline when player exits range
             HideOutline();
         }
     }
@@ -139,43 +116,36 @@ public class Relic : MonoBehaviour {
 
         isCollected = true;
 
-        // Hide prompt if showing
-        if (!autoCollect) {
+        if (!autoCollect)
             UIEvents.OnPromptHide?.Invoke();
-        }
 
-        // Hide outline
         HideOutline();
 
-        // Stop ambient sound
-        if (!string.IsNullOrEmpty(ambientAudioClip)) {
+        if (!string.IsNullOrEmpty(ambientAudioClip))
             AudioEvents.OnStopAudio?.Invoke(ambientAudioClip);
-        }
 
-        // Play collection sound
-        if (!string.IsNullOrEmpty(collectAudioClip)) {
+        if (!string.IsNullOrEmpty(collectAudioClip))
             AudioEvents.OnPlayAudio?.Invoke(collectAudioClip, AudioType.SFX);
-        }
 
-        // Play collection effect
         if (collectEffect != null) {
             collectEffect.Play();
+            StartCoroutine(WaitForParticleSystem());
+        }
+    }
+
+    private IEnumerator WaitForParticleSystem() {
+        while (collectEffect.isPlaying) {
+            yield return null;
         }
 
-        // Hide visual representation
-        if (visualRepresentation != null) {
+        if (visualRepresentation != null)
             visualRepresentation.SetActive(false);
-        }
 
-        // Turn off light
-        if (relicLight != null) {
+        if (relicLight != null)
             relicLight.enabled = false;
-        }
 
-        // Trigger game win condition
         GameEvents.OnGameWonTriggered?.Invoke();
 
-        // Destroy the relic after a delay to allow effects to play
         Destroy(gameObject, 3f);
     }
 
@@ -187,23 +157,19 @@ public class Relic : MonoBehaviour {
     }
 
     private void ShowOutline() {
-        if (outlineController != null && !isCollected) {
+        if (outlineController != null && !isCollected)
             outlineController.ShowOutline();
-        }
     }
 
     private void HideOutline() {
-        if (outlineController != null) {
+        if (outlineController != null)
             outlineController.HideOutline();
-        }
     }
 
     private void OnDrawGizmosSelected() {
-        // Draw relic indicator
         Gizmos.color = isCollected ? Color.gray : Color.yellow;
         Gizmos.DrawWireSphere(transform.position, 1f);
 
-        // Draw victory indicator
         Gizmos.color = Color.yellow;
         for (int i = 0; i < 8; i++) {
             float angle = i * 45f * Mathf.Deg2Rad;

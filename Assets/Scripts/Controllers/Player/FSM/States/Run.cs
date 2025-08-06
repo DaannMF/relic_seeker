@@ -33,7 +33,6 @@ public class RunState : BaseState<EPlayerStates> {
                 return EPlayerStates.Run;
             else
                 return EPlayerStates.Walk;
-
         }
 
         return EPlayerStates.Idle;
