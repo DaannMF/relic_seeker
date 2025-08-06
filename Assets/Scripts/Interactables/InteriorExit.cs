@@ -5,6 +5,9 @@ public class InteriorExit : MonoBehaviour {
     [Header("Exit Settings")]
     [SerializeField] private bool autoExit = false;
 
+    [Header("Outline Settings")]
+    [SerializeField] private OutlineController outlineController;
+
     private bool playerInRange = false;
     private PlayerController currentPlayer;
 
@@ -12,6 +15,11 @@ public class InteriorExit : MonoBehaviour {
         Collider col = GetComponent<Collider>();
         if (col != null) {
             col.isTrigger = true;
+        }
+
+        // Auto-assign OutlineController if not assigned
+        if (outlineController == null) {
+            outlineController = GetComponentInChildren<OutlineController>();
         }
     }
 
@@ -27,6 +35,9 @@ public class InteriorExit : MonoBehaviour {
             else {
                 UpdatePrompt();
             }
+
+            // Show outline when player enters range
+            ShowOutline();
         }
     }
 
@@ -36,6 +47,9 @@ public class InteriorExit : MonoBehaviour {
             playerInRange = false;
             currentPlayer = null;
             UIEvents.OnPromptHide.Invoke();
+
+            // Hide outline when player exits range
+            HideOutline();
         }
     }
 
@@ -98,5 +112,17 @@ public class InteriorExit : MonoBehaviour {
 
         Controllable controllable = currentPlayer.transform.parent.GetComponent<Controllable>();
         return controllable != null && controllable.IsOriginalPlayer();
+    }
+
+    private void ShowOutline() {
+        if (outlineController != null) {
+            outlineController.ShowOutline();
+        }
+    }
+
+    private void HideOutline() {
+        if (outlineController != null) {
+            outlineController.HideOutline();
+        }
     }
 }

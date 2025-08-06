@@ -43,7 +43,7 @@ MonoBehaviour:
     audioType: 2
     loop: 0
     is3D: 0
-  - clipName: Dok_Bark
+  - clipName: Dog_Bark
     clip: {fileID: 8300000, guid: 95d601c4f567f47aeab8fc44e2f0a364, type: 3}
     audioType: 2
     loop: 0

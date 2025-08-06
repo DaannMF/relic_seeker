@@ -17,10 +17,6 @@ public class DogStateContext : BaseStateContext<EDogStates> {
         return dogController.CanSeePlayer();
     }
 
-    public float DistanceToPlayer() {
-        return dogController.DistanceToPlayer();
-    }
-
     public DogStateContext(Animator animator, DogController dogController) {
         this._animator = animator;
         this.dogController = dogController;

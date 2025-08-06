@@ -1,6 +1,9 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public enum SceneLoadType {
     Single,
@@ -68,7 +71,25 @@ public class GameSceneManager : MonoBehaviour {
     }
 
     public void LoadSingleScene(string sceneName) {
-        StartCoroutine(LoadSceneCoroutine(sceneName, SceneLoadType.Single));
+        Debug.Log($"[GameSceneManager] LoadSingleScene called with: {sceneName}");
+
+        // Check if scene exists in build settings
+#if UNITY_EDITOR
+        int sceneIndex = SceneUtility.GetBuildIndexByScenePath(sceneName);
+        if (sceneIndex == -1) {
+            Debug.LogError($"[GameSceneManager] Scene '{sceneName}' not found in Build Settings! Please add it to Build Settings.");
+            return;
+        }
+#endif
+
+        // Store current timeScale and temporarily restore it for scene loading
+        float originalTimeScale = Time.timeScale;
+        if (Time.timeScale == 0f) {
+            Debug.Log("[GameSceneManager] Time is paused, temporarily restoring timeScale for scene loading");
+            Time.timeScale = 1f;
+        }
+
+        StartCoroutine(LoadSceneCoroutineWithTimeScale(sceneName, SceneLoadType.Single, originalTimeScale));
     }
 
     public void ExitInterior() {
@@ -78,6 +99,21 @@ public class GameSceneManager : MonoBehaviour {
         }
 
         StartCoroutine(ExitInteriorCoroutine());
+    }
+
+    private IEnumerator LoadSceneCoroutineWithTimeScale(string sceneName, SceneLoadType loadType, float originalTimeScale, string spawnPointID = "") {
+        Debug.Log($"[GameSceneManager] Starting LoadSceneCoroutineWithTimeScale with originalTimeScale: {originalTimeScale}");
+
+        // Ensure time is running for the coroutine to work properly
+        if (Time.timeScale == 0f) {
+            Time.timeScale = 1f;
+        }
+
+        yield return StartCoroutine(LoadSceneCoroutine(sceneName, loadType, spawnPointID));
+
+        // Restore original timeScale after scene loading is complete
+        Debug.Log($"[GameSceneManager] Scene loading complete, restoring timeScale to: {originalTimeScale}");
+        Time.timeScale = originalTimeScale;
     }
 
     private IEnumerator LoadSceneCoroutine(string sceneName, SceneLoadType loadType, string spawnPointID = "") {
@@ -155,7 +191,7 @@ public class GameSceneManager : MonoBehaviour {
         float elapsedTime = 0f;
 
         while (elapsedTime < loadingTime || loadOperation.progress < 0.9f) {
-            elapsedTime += Time.deltaTime;
+            elapsedTime += Time.unscaledDeltaTime; // Use unscaled time to work during pause
             fakeProgress = Mathf.Clamp01(elapsedTime / loadingTime);
 
             float realProgress = Mathf.Clamp01(loadOperation.progress / 0.9f);
@@ -178,7 +214,7 @@ public class GameSceneManager : MonoBehaviour {
             canvasManager.UpdateLoadingProgress(1f);
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSecondsRealtime(0.5f); // Use realtime to work during pause
     }
 
     private IEnumerator SetupInteriorScene(string sceneName, string spawnPointID) {
@@ -368,6 +404,14 @@ public class GameSceneManager : MonoBehaviour {
         GameEvents.OnReturnToMenuRequested?.Invoke();
     }
 
+    public void LoadCreditsScene(string creditsSceneName = "Credits") {
+        Debug.Log($"[GameSceneManager] LoadCreditsScene called with scene: {creditsSceneName}");
+        Debug.Log($"[GameSceneManager] Current timeScale: {Time.timeScale}");
+
+        // Load scene first, then clean up after it's loaded
+        StartCoroutine(LoadCreditsSceneCoroutine(creditsSceneName));
+    }
+
     public void SetLoadingUI(LoadingUI loading) {
         loadingUI = loading;
     }
@@ -390,5 +434,99 @@ public class GameSceneManager : MonoBehaviour {
             current = current.parent;
         }
         return false;
+    }
+
+    private IEnumerator LoadCreditsSceneCoroutine(string creditsSceneName) {
+        Debug.Log($"[GameSceneManager] Starting LoadCreditsSceneCoroutine for: {creditsSceneName}");
+
+        // Store current timeScale and temporarily restore it for scene loading
+        float originalTimeScale = Time.timeScale;
+        if (Time.timeScale == 0f) {
+            Debug.Log("[GameSceneManager] Time is paused, temporarily restoring timeScale for scene loading");
+            Time.timeScale = 1f;
+        }
+
+        // Check if scene exists in build settings
+#if UNITY_EDITOR
+        int sceneIndex = SceneUtility.GetBuildIndexByScenePath(creditsSceneName);
+        if (sceneIndex == -1) {
+            Debug.LogError($"[GameSceneManager] Scene '{creditsSceneName}' not found in Build Settings! Please add it to Build Settings.");
+            yield break;
+        }
+#endif
+
+        // Load the credits scene
+        yield return StartCoroutine(LoadSceneCoroutine(creditsSceneName, SceneLoadType.Single));
+
+        // Wait a bit to ensure the scene is fully loaded and active
+        yield return new WaitForSecondsRealtime(0.5f);
+
+        // Now clean up DontDestroyOnLoad objects after the scene is loaded
+        Debug.Log("[GameSceneManager] Scene loaded successfully, now cleaning up DontDestroyOnLoad objects...");
+        CleanupDontDestroyOnLoadObjects();
+
+        // Finally, destroy this GameSceneManager as well
+        Debug.Log("[GameSceneManager] Cleanup complete, destroying GameSceneManager...");
+        Destroy(gameObject);
+    }
+
+    private void CleanupDontDestroyOnLoadObjects() {
+        Debug.Log("[GameSceneManager] Cleaning up DontDestroyOnLoad objects...");
+
+        // Find all root objects in the DontDestroyOnLoad scene
+        GameObject[] dontDestroyObjects = FindObjectsOfType<GameObject>();
+        int destroyedCount = 0;
+
+        foreach (GameObject obj in dontDestroyObjects) {
+            // Only consider root objects (no parent)
+            if (obj.transform.parent == null && obj.scene.name == "DontDestroyOnLoad") {
+                // Skip essential Unity objects (like the event system)
+                if (ShouldDestroyDontDestroyOnLoadObject(obj)) {
+                    Debug.Log($"[GameSceneManager] Destroying DontDestroyOnLoad object: {obj.name}");
+                    Destroy(obj);
+                    destroyedCount++;
+                }
+            }
+        }
+
+        Debug.Log($"[GameSceneManager] Cleaned up {destroyedCount} DontDestroyOnLoad objects");
+    }
+
+    private bool ShouldDestroyDontDestroyOnLoadObject(GameObject obj) {
+        // List of objects we want to keep (essential Unity systems)
+        string[] keepObjects = {
+            "EventSystem",
+            "Main Camera", // In case there's a main camera marked as DontDestroyOnLoad
+        };
+
+        // List of game objects we specifically want to destroy
+        string[] destroyObjects = {
+            "GameController",
+            "InteriorSceneManager",
+            "CanvasManager",
+            "KeyInventoryManager",
+            "AudioManager"
+            // Note: GameSceneManager will destroy itself after cleanup
+        };
+
+        // Don't destroy essential Unity objects
+        foreach (string keepName in keepObjects) {
+            if (obj.name.Contains(keepName)) {
+                Debug.Log($"[GameSceneManager] Keeping essential object: {obj.name}");
+                return false;
+            }
+        }
+
+        // Specifically destroy our game managers
+        foreach (string destroyName in destroyObjects) {
+            if (obj.name.Contains(destroyName)) {
+                Debug.Log($"[GameSceneManager] Will destroy game manager: {obj.name}");
+                return true;
+            }
+        }
+
+        // For any other objects, log them but destroy them (safer approach)
+        Debug.Log($"[GameSceneManager] Unknown DontDestroyOnLoad object, will destroy: {obj.name}");
+        return true;
     }
 }

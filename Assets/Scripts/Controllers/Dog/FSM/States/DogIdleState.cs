@@ -1,5 +1,3 @@
-using UnityEngine;
-
 public class DogIdleState : BaseState<EDogStates> {
     protected new DogStateContext Context => base.Context as DogStateContext;
     private new DogIdleSO StateData => base.StateData as DogIdleSO;

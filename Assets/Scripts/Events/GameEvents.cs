@@ -1,7 +1,6 @@
 using UnityEngine.Events;
 
-public enum GameState
-{
+public enum GameState {
     MainMenu,
     Playing,
     Paused,
@@ -9,8 +8,7 @@ public enum GameState
     Lost
 }
 
-public static class GameEvents
-{
+public static class GameEvents {
     // INPUT EVENTS - Other scripts invoke these to request game state changes
     public static UnityAction OnPauseRequested;
     public static UnityAction OnResumeRequested;

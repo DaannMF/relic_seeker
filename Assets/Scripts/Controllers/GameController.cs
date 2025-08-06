@@ -92,7 +92,22 @@ public class GameController : MonoBehaviour {
     }
 
     private void HandleGameWonTriggered() {
+        Debug.Log("[GameController] Game won triggered! Setting state to Won and loading credits...");
         SetGameState(GameState.Won);
+
+        // Load credits immediately instead of using Invoke
+        Debug.Log("[GameController] About to call LoadCredits directly...");
+        LoadCredits();
+    }
+
+    private void LoadCredits() {
+        Debug.Log("[GameController] Loading credits scene...");
+        if (GameSceneManager.Instance != null) {
+            GameSceneManager.Instance.LoadCreditsScene("Credits");
+        }
+        else {
+            Debug.LogError("[GameController] GameSceneManager.Instance is null! Cannot load credits.");
+        }
     }
 
     private void HandleGameLostTriggered() {
@@ -123,6 +138,7 @@ public class GameController : MonoBehaviour {
                 }
                 break;
             case GameState.Won:
+                Debug.Log("[GameController] Setting state to Won, pausing time and invoking OnGameWon");
                 Time.timeScale = 0f; // Pause on game over
                 GameEvents.OnGameWon?.Invoke();
                 break;

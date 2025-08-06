@@ -19,6 +19,9 @@ public class Lever : MonoBehaviour {
     [Header("Animation")]
     [SerializeField] private float rotationSpeed = 2f;
 
+    [Header("Outline Settings")]
+    [SerializeField] private OutlineController outlineController;
+
     private bool playerInRange = false;
     private PlayerController currentPlayer;
     private bool isAnimating = false;
@@ -46,6 +49,11 @@ public class Lever : MonoBehaviour {
             leverVisual.transform.localRotation = Quaternion.Euler(isActivated ? activatedRotation : deactivatedRotation);
         }
 
+        // Auto-assign OutlineController if not assigned
+        if (outlineController == null) {
+            outlineController = GetComponentInChildren<OutlineController>();
+        }
+
         // Initialize connected fences
         UpdateConnectedFences();
     }
@@ -56,6 +64,7 @@ public class Lever : MonoBehaviour {
             playerInRange = true;
             currentPlayer = player;
             UpdatePrompt();
+            ShowOutline();
         }
     }
 
@@ -65,6 +74,7 @@ public class Lever : MonoBehaviour {
             playerInRange = false;
             currentPlayer = null;
             UIEvents.OnPromptHide?.Invoke();
+            HideOutline();
         }
     }
 
@@ -147,22 +157,6 @@ public class Lever : MonoBehaviour {
         }
     }
 
-    public void SetActivated(bool activated) {
-        if (isActivated == activated) return;
-
-        isActivated = activated;
-
-        if (leverVisual != null) {
-            leverVisual.transform.localRotation = Quaternion.Euler(isActivated ? activatedRotation : deactivatedRotation);
-        }
-
-        UpdateConnectedFences();
-
-        if (playerInRange) {
-            UpdatePrompt();
-        }
-    }
-
     private void OnDrawGizmosSelected() {
         // Draw lever indicator
         Gizmos.color = isActivated ? Color.green : Color.red;
@@ -182,5 +176,17 @@ public class Lever : MonoBehaviour {
         UnityEditor.Handles.Label(transform.position + Vector3.up * 2f,
             $"Lever\nActivated: {isActivated}\nCan Deactivate: {canBeDeactivated}\nConnected Fences: {(connectedFences?.Length ?? 0)}");
 #endif
+    }
+
+    private void ShowOutline() {
+        if (outlineController != null) {
+            outlineController.ShowOutline();
+        }
+    }
+
+    private void HideOutline() {
+        if (outlineController != null) {
+            outlineController.HideOutline();
+        }
     }
 }

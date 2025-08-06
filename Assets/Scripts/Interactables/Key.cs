@@ -10,6 +10,9 @@ public class Key : MonoBehaviour {
     [Header("Audio")]
     [SerializeField] private string pickupAudioClip = "Key_Pickup";
 
+    [Header("Outline Settings")]
+    [SerializeField] private OutlineController outlineController;
+
     private bool isCollected = false;
     private bool playerInRange = false;
     private PlayerController currentPlayer;
@@ -32,6 +35,11 @@ public class Key : MonoBehaviour {
                 visualRepresentation = transform.GetChild(0).gameObject;
             }
         }
+
+        // Auto-assign OutlineController if not assigned
+        if (outlineController == null) {
+            outlineController = GetComponentInChildren<OutlineController>();
+        }
     }
 
     private void OnTriggerEnter(Collider other) {
@@ -48,6 +56,9 @@ public class Key : MonoBehaviour {
             else {
                 UIEvents.OnPromptShow?.Invoke("Press E to pick up key");
             }
+
+            // Show outline when player enters range
+            ShowOutline();
         }
     }
 
@@ -60,6 +71,9 @@ public class Key : MonoBehaviour {
             if (!autoPickup) {
                 UIEvents.OnPromptHide?.Invoke();
             }
+
+            // Hide outline when player exits range
+            HideOutline();
         }
     }
 
@@ -97,8 +111,23 @@ public class Key : MonoBehaviour {
             visualRepresentation.SetActive(false);
         }
 
+        // Hide outline before destroying
+        HideOutline();
+
         // Disable the key (or destroy it after a delay)
         Destroy(gameObject);
+    }
+
+    private void ShowOutline() {
+        if (outlineController != null && !isCollected) {
+            outlineController.ShowOutline();
+        }
+    }
+
+    private void HideOutline() {
+        if (outlineController != null) {
+            outlineController.HideOutline();
+        }
     }
 
     private void OnDrawGizmosSelected() {

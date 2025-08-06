@@ -9,6 +9,9 @@ public class InteriorEntrance : MonoBehaviour {
     [Header("Key Requirements")]
     [SerializeField] private int requiredKeys = 0;
 
+    [Header("Outline Settings")]
+    [SerializeField] private OutlineController outlineController;
+
     private bool playerInRange = false;
     private PlayerController currentPlayer;
     private int playerCurrentKeys = 0;
@@ -22,6 +25,11 @@ public class InteriorEntrance : MonoBehaviour {
 
         // Subscribe to key count changes
         InventoryEvents.OnKeyCountChanged += OnKeyCountChanged;
+
+        // Auto-assign OutlineController if not assigned
+        if (outlineController == null) {
+            outlineController = GetComponentInChildren<OutlineController>();
+        }
     }
 
     private void OnDestroy() {
@@ -37,6 +45,9 @@ public class InteriorEntrance : MonoBehaviour {
 
             // Get current key count and update prompt
             InventoryEvents.OnGetKeyCount?.Invoke(OnKeyCountReceived);
+
+            // Show outline when player enters range
+            ShowOutline();
         }
     }
 
@@ -46,6 +57,9 @@ public class InteriorEntrance : MonoBehaviour {
             playerInRange = false;
             currentPlayer = null;
             UIEvents.OnPromptHide?.Invoke();
+
+            // Hide outline when player exits range
+            HideOutline();
         }
     }
 
@@ -155,5 +169,17 @@ public class InteriorEntrance : MonoBehaviour {
 
         Controllable controllable = currentPlayer.transform.parent.GetComponent<Controllable>();
         return controllable != null && controllable.IsOriginalPlayer();
+    }
+
+    private void ShowOutline() {
+        if (outlineController != null) {
+            outlineController.ShowOutline();
+        }
+    }
+
+    private void HideOutline() {
+        if (outlineController != null) {
+            outlineController.HideOutline();
+        }
     }
 }

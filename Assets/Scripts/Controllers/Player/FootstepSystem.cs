@@ -32,6 +32,12 @@ public class FootstepSystem : MonoBehaviour {
             return;
         }
 
+        // Don't play footsteps if not controlling the original player
+        if (!IsOriginalPlayer()) {
+            footstepTimer = 0f;
+            return;
+        }
+
         footstepTimer += Time.deltaTime;
 
         if (footstepTimer >= interval) {
@@ -101,4 +107,11 @@ public class FootstepSystem : MonoBehaviour {
 
     public float GetWalkInterval() => walkFootstepInterval;
     public float GetRunInterval() => runFootstepInterval;
+
+    private bool IsOriginalPlayer() {
+        if (playerController == null) return false;
+
+        Controllable controllable = playerController.transform.parent.GetComponent<Controllable>();
+        return controllable != null && controllable.IsOriginalPlayer();
+    }
 }

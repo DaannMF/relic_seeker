@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c73e3e7c7e8e4aee9f01c15234fd33b, type: 3}
   m_Name: PlayerJump_Data
   m_EditorClassIdentifier: 
-  jumpForce: 8
+  jumpForce: 7
   jumpForceMode: 1
-  gravity: 20
+  gravity: 25
   maxFallSpeed: 15
   airMoveForce: 100
   maxAirSpeed: 5

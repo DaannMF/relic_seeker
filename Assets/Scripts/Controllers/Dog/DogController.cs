@@ -83,7 +83,6 @@ public class DogController : MonoBehaviour {
 
     public void PlayBarkSound() {
         if (audioSourcePosition != null && !string.IsNullOrEmpty(barkAudioClip)) {
-            Debug.Log("Playing bark sound");
             AudioEvents.OnPlayAudio3D?.Invoke(barkAudioClip, AudioType.SFX, audioSourcePosition.position);
         }
     }
@@ -94,11 +93,6 @@ public class DogController : MonoBehaviour {
         float distanceToPlayer = Vector3.Distance(transform.position, _player.position);
 
         return distanceToPlayer <= detectionRange;
-    }
-
-    public float DistanceToPlayer() {
-        if (_player == null) return float.MaxValue;
-        return Vector3.Distance(transform.position, _player.position);
     }
 
 #if UNITY_EDITOR

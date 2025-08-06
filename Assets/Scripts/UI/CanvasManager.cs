@@ -21,7 +21,6 @@ public class CanvasManager : MonoBehaviour {
         }
 
         Cursor.SetCursor(cursorTexture, new Vector2(cursorTexture.width / 2, cursorTexture.height / 2), CursorMode.Auto);
-        Cursor.visible = true;
         Cursor.lockState = CursorLockMode.Confined;
     }
 
@@ -68,13 +67,13 @@ public class CanvasManager : MonoBehaviour {
                 break;
             case GameState.Won:
             case GameState.Lost:
-                ShowMainMenu();
                 break;
         }
     }
 
     public void ShowMainMenu() {
         Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = true;
 
         if (mainMenuPanel != null) {
             mainMenuPanel.SetActive(true);
@@ -85,6 +84,7 @@ public class CanvasManager : MonoBehaviour {
     }
 
     public void HideMainMenu() {
+        Cursor.visible = false;
         if (mainMenuPanel != null) {
             mainMenuPanel.SetActive(false);
         }

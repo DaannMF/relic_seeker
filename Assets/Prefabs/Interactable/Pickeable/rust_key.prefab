@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1535711042821190015}
   - component: {fileID: 4505736798430878608}
   - component: {fileID: 274016042598302380}
+  - component: {fileID: 4189205851213643417}
   m_Layer: 0
   m_Name: rust_key
   m_TagString: Untagged
@@ -119,6 +120,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   keyValue: 1
-  autoPickup: 1
+  autoPickup: 0
   visualRepresentation: {fileID: 4843604033471516100}
   pickupAudioClip: Key_Pickup
+  outlineController: {fileID: 4189205851213643417}
+--- !u!114 &4189205851213643417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4843604033471516100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 341e7e6ff011041f5b27db6180389097, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  outlineMaterial: {fileID: 2100000, guid: 3d2244ecd5eaf40ff8fc215b374083c0, type: 2}
+  autoFindRenderers: 1
+  replaceBaseMaterial: 0
+  baseMaterialIndex: 0
